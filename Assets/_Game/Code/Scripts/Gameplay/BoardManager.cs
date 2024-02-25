@@ -1,12 +1,11 @@
 using NaughtyAttributes;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class BoardManager : MonoBehaviour
 {
     [Header("Board")]
-    [SerializeField] private Image m_BoardImage;
+    [SerializeField] private SpriteRenderer m_BoardImage;
     [SerializeField] private BoardTile m_TilePrefab;
     [SerializeField] private float m_TileSize;
     [SerializeField] private float m_TileSpacing;
@@ -32,32 +31,17 @@ public class BoardManager : MonoBehaviour
 
     public static BoardManager Instance;
 
-    private void Awake()
+    private void Start()
     {
         Instance = this;
 
-        //m_Board.transform.localScale = new Vector3(
-        //    (m_Scenario.BoardSize.x * m_TileSize) + ((m_Scenario.BoardSize.x + 1) * m_TileSpacing), 
-        //    (m_Scenario.BoardSize.y * m_TileSize) + ((m_Scenario.BoardSize.y + 1) * m_TileSpacing), 
-        //    1);
-
         SetupBackground();
 
-        for (int x = 0; x < m_Scenario.BoardSize.x; x++)
-        {
-            for (int y = 0; y < m_Scenario.BoardSize.y; y++)
-            {
-                BoardTile tile = Instantiate(m_TilePrefab, BoardPositionToWorldPosition(x,y), Quaternion.identity);
-                tile.transform.localScale = new Vector3(m_TileSize, m_TileSize, 1);    
-                tile.transform.SetParent(m_BoardImage.transform);
-                tile.Init(new Vector2(x, y), y == 0 ? ETeam.Player2 : y == m_Scenario.BoardSize.y -1 ? ETeam.Player1 : ETeam.None);
-
-                m_Tiles.Add(new Vector2(x, y), tile);
-            }
-        }
+        SetupTiles();
 
         m_TotalCells = (int)m_Scenario.BoardSize.x * (int)m_Scenario.BoardSize.y;
-        StartGame();
+
+        SetupPawns();
     }
 
     public void ClickOnTile(BoardTile tile)
@@ -104,39 +88,6 @@ public class BoardManager : MonoBehaviour
         CheckWin();
     }
 
-    private void StartGame()
-    {
-        for (int i = 0; i < m_Scenario.Pieces.Count; i++)
-        {
-            if (m_Scenario.Pieces[i] == null) continue;
-
-            // PLAYER 1
-            var piece = Instantiate(m_PawnPrefab);
-            piece.Init(ETeam.Player1, m_Scenario.Pieces[i]);
-            m_Tiles[new Vector2(i % (int)m_Scenario.BoardSize.x, i / (int)m_Scenario.BoardSize.x)].SetPiece(piece);
-            m_Player1.Add(piece);
-
-            // PLAYER 2
-            int reversedIndex = m_TotalCells - 1 - i;
-            piece = Instantiate(m_PawnPrefab);
-            piece.Init(ETeam.Player2, m_Scenario.Pieces[i]);
-            m_Tiles[new Vector2(reversedIndex % (int)m_Scenario.BoardSize.x, reversedIndex / (int)m_Scenario.BoardSize.x)].SetPiece(piece);
-            m_Player2.Add(piece);
-        }
-
-        m_BoardState = EBoardState.Player1PawnSelection;
-    }
-    private void Clear()
-    {
-        foreach (var player in m_Player1)
-            Destroy(player.gameObject);
-
-        foreach (var player in m_Player2)
-            Destroy(player.gameObject);
-
-        m_Player1.Clear();
-        m_Player2.Clear();
-    }
     private void PlayerSelectPiece(BoardTile tile)
     {
         m_AcutalTile = tile;
@@ -198,23 +149,75 @@ public class BoardManager : MonoBehaviour
 
         return new Vector3(centeredXOffset, centeredYOffset, -1);
     }
-    [Button]
-    private void SetupBackground()
-    {
-        m_BoardImage.sprite = m_BoardList[Random.Range(0, m_BoardList.Count)];
-    }
     private void CheckWin() //TODO rework : Victory if the enemy "king" is taken
     {
-        if(m_Player1.Count != 0 && m_Player2.Count != 0)
+        if (m_Player1.Count != 0 && m_Player2.Count != 0)
             return;
         else if (m_Player1.Count == 0)
             Debug.Log("Player2 Won");
-        else if(m_Player2.Count == 0)
+        else if (m_Player2.Count == 0)
             Debug.Log("Player1 Won");
 
         Clear();
-        StartGame();
+        SetupPawns();
     }
+
+    #region Init
+
+    private void Clear()
+    {
+        foreach (var player in m_Player1)
+            Destroy(player.gameObject);
+
+        foreach (var player in m_Player2)
+            Destroy(player.gameObject);
+
+        m_Player1.Clear();
+        m_Player2.Clear();
+    }
+    [Button] private void SetupBackground()
+    {
+        m_BoardImage.sprite = m_BoardList[Random.Range(0, m_BoardList.Count)];
+    }
+    private void SetupTiles()
+    {
+        for (int x = 0; x < m_Scenario.BoardSize.x; x++)
+        {
+            for (int y = 0; y < m_Scenario.BoardSize.y; y++)
+            {
+                BoardTile tile = Instantiate(m_TilePrefab, BoardPositionToWorldPosition(x, y), Quaternion.identity);
+                tile.transform.localScale = new Vector3(m_TileSize, m_TileSize, 1);
+                tile.transform.SetParent(m_BoardImage.transform);
+                tile.Init(new Vector2(x, y), y == 0 ? ETeam.Player2 : y == m_Scenario.BoardSize.y - 1 ? ETeam.Player1 : ETeam.None);
+
+                m_Tiles.Add(new Vector2(x, y), tile);
+            }
+        }
+    }
+    private void SetupPawns()
+    {
+        for (int i = 0; i < m_Scenario.Pieces.Count; i++)
+        {
+            if (m_Scenario.Pieces[i] == null) continue;
+
+            // PLAYER 1
+            var piece = Instantiate(m_PawnPrefab);
+            piece.Init(ETeam.Player1, m_Scenario.Pieces[i]);
+            m_Tiles[new Vector2(i % (int)m_Scenario.BoardSize.x, i / (int)m_Scenario.BoardSize.x)].SetPiece(piece);
+            m_Player1.Add(piece);
+
+            // PLAYER 2
+            int reversedIndex = m_TotalCells - 1 - i;
+            piece = Instantiate(m_PawnPrefab);
+            piece.Init(ETeam.Player2, m_Scenario.Pieces[i]);
+            m_Tiles[new Vector2(reversedIndex % (int)m_Scenario.BoardSize.x, reversedIndex / (int)m_Scenario.BoardSize.x)].SetPiece(piece);
+            m_Player2.Add(piece);
+        }
+
+        m_BoardState = EBoardState.Player1PawnSelection;
+    }
+
+    #endregion
 }
 
 public enum EBoardState

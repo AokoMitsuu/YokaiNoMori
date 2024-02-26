@@ -7,15 +7,24 @@ public class PawnController : MonoBehaviour
     [SerializeField] private ETeam m_Team;
     [SerializeField] private Image m_Image;
 
+    private Vector2 m_Position;
+
     public PawnSo PawnSo => m_PawnSo;
     public ETeam Team => m_Team;
+    public Vector2 Position => m_Position;
 
-    public void Init(ETeam team, PawnSo pawn)
+    public void Init(ETeam team, PawnSo pawn, Vector2 pPosition)
     {
         m_Team = team;
         m_PawnSo = pawn;
         m_Image.sprite = pawn.Sprite;
         transform.eulerAngles = team == ETeam.Player1 ? new Vector3(0f, 0f, 0f) : new Vector3(0f, 0f, 180f);
+        SetPosition(pPosition);
+    }
+
+    public void SetPosition(Vector2 pPosition)
+    {
+        m_Position = pPosition;
     }
 
     public void Promote()

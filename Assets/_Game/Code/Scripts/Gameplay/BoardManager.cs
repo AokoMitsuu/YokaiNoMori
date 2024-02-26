@@ -1,7 +1,10 @@
 using NaughtyAttributes;
+using NaughtyAttributes.Editor;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 using UnityEngine.UI;
+using UnityEngine.WSA;
 
 public class BoardManager : MonoBehaviour
 {
@@ -23,6 +26,7 @@ public class BoardManager : MonoBehaviour
 
     private Dictionary<Vector2, BoardTile> m_Tiles = new();
     private List<BoardTile> m_ReachableTiles = new();
+    private List<BoardTile> m_PlayerTiles = new();
 
     private BoardTile m_AcutalTile = null;
     private PawnController m_AcutalPawn = null;
@@ -63,12 +67,12 @@ public class BoardManager : MonoBehaviour
         }
         else if (m_BoardState == EBoardState.Player1PawnMove || m_BoardState == EBoardState.Player2PawnMove)
         {
-            m_AcutalTile.SetSelected(false);
+            m_AcutalTile.SetColor(EColorType.None);
             m_AcutalTile = null;
             m_AcutalPawn = null;
             foreach (var reachableTile in m_ReachableTiles)
             {
-                reachableTile.SetHighlight(false);
+                reachableTile.SetColor(EColorType.None);
             }
             m_ReachableTiles.Clear();
 
@@ -77,6 +81,8 @@ public class BoardManager : MonoBehaviour
             else
                 m_BoardState = EBoardState.Player2PawnSelection;
         }
+
+        GenerateMoveableCard();
     }
     public void RemovePiece(PawnController piece)
     {
@@ -89,15 +95,47 @@ public class BoardManager : MonoBehaviour
         CheckWin();
     }
 
+    private void GenerateMoveableCard()
+    {
+        foreach(var tile in m_PlayerTiles)
+        {
+            tile.SetColor(EColorType.None);
+        }
+        m_PlayerTiles.Clear();
+
+        if (m_BoardState == EBoardState.Player1PawnSelection || m_BoardState == EBoardState.Player1PawnMove)
+        {
+            foreach (var pawn in m_Player1)
+            {
+                if (GenerateReachableTileList(pawn).Count > 0 && m_Tiles.TryGetValue(pawn.Position, out var tile))
+                {
+                    m_PlayerTiles.Add(tile);
+                    tile.SetColor(EColorType.Moveable);
+                }
+            }
+        }
+        else
+        {
+            foreach (var pawn in m_Player2)
+            {
+                if (GenerateReachableTileList(pawn).Count > 0 && m_Tiles.TryGetValue(pawn.Position, out var tile))
+                {
+                    m_PlayerTiles.Add(tile);
+                    tile.SetColor(EColorType.Moveable);
+                }
+            }
+        }
+
+    }
     private void PlayerSelectPiece(BoardTile tile)
     {
         m_AcutalTile = tile;
-        m_AcutalTile.SetSelected(true);
+        m_AcutalTile.SetColor(EColorType.Select);
         m_AcutalPawn = tile.PieceController;
-        GenerateReachableTileList(tile.BoardPosition, m_AcutalPawn);
+        m_ReachableTiles.AddRange(GenerateReachableTileList(m_AcutalPawn));
         foreach (var reachableTile in m_ReachableTiles)
         {
-            reachableTile.SetHighlight(true);
+            reachableTile.SetColor(EColorType.Highlight);
         }
 
         if(m_BoardState == EBoardState.Player1PawnSelection)
@@ -108,12 +146,12 @@ public class BoardManager : MonoBehaviour
     private void PlayerSelectMove(BoardTile tile)
     {
         m_AcutalTile.RemovePiece();
-        m_AcutalTile.SetSelected(false);
+        m_AcutalTile.SetColor(EColorType.None);
         tile.SetPiece(m_AcutalPawn);
         m_AcutalPawn = null;
         foreach (var reachableTile in m_ReachableTiles)
         {
-            reachableTile.SetHighlight(false);
+            reachableTile.SetColor(EColorType.None);
         }
         m_ReachableTiles.Clear();
 
@@ -122,20 +160,22 @@ public class BoardManager : MonoBehaviour
         else
             m_BoardState = EBoardState.Player1PawnSelection;
     }
-    private void GenerateReachableTileList(Vector2 pos, PawnController piece)
+    private List<BoardTile> GenerateReachableTileList(PawnController piece)
     {
-        foreach(var range in piece.PawnSo.Ranges)
+        List<BoardTile> listTemp = new();
+        foreach (var range in piece.PawnSo.Ranges)
         {
             Vector2 newPos = Vector2.zero;
 
-            if (m_AcutalPawn.Team == ETeam.Player1)
-                newPos = new Vector2(pos.x + range.x, pos.y + range.y);
+            if (piece.Team == ETeam.Player1)
+                newPos = new Vector2(piece.Position.x + range.x, piece.Position.y + range.y);
             else
-                newPos = new Vector2(pos.x + range.x, pos.y - range.y);
+                newPos = new Vector2(piece.Position.x + range.x, piece.Position.y - range.y);
 
             if (m_Tiles.TryGetValue(newPos, out var tile) && (tile.PieceController == null || tile.PieceController.Team != piece.Team))
-                m_ReachableTiles.Add(tile);
+                listTemp.Add(tile);
         }
+        return listTemp;
     }
     private Vector3 BoardPositionToWorldPosition(int x, int y)
     {
@@ -203,19 +243,22 @@ public class BoardManager : MonoBehaviour
 
             // PLAYER 1
             var piece = Instantiate(m_PawnPrefab);
-            piece.Init(ETeam.Player1, m_Scenario.Pieces[i]);
-            m_Tiles[new Vector2(i % (int)m_Scenario.BoardSize.x, i / (int)m_Scenario.BoardSize.x)].SetPiece(piece);
+            var pos = new Vector2(i % (int)m_Scenario.BoardSize.x, i / (int)m_Scenario.BoardSize.x);
+            piece.Init(ETeam.Player1, m_Scenario.Pieces[i], pos);
+            m_Tiles[pos].SetPiece(piece);
             m_Player1.Add(piece);
 
             // PLAYER 2
             int reversedIndex = m_TotalCells - 1 - i;
             piece = Instantiate(m_PawnPrefab);
-            piece.Init(ETeam.Player2, m_Scenario.Pieces[i]);
-            m_Tiles[new Vector2(reversedIndex % (int)m_Scenario.BoardSize.x, reversedIndex / (int)m_Scenario.BoardSize.x)].SetPiece(piece);
+            pos = new Vector2(reversedIndex % (int)m_Scenario.BoardSize.x, reversedIndex / (int)m_Scenario.BoardSize.x);
+            piece.Init(ETeam.Player2, m_Scenario.Pieces[i], pos);
+            m_Tiles[pos].SetPiece(piece);
             m_Player2.Add(piece);
         }
 
         m_BoardState = EBoardState.Player1PawnSelection;
+        GenerateMoveableCard();
     }
 
     #endregion

@@ -4,9 +4,10 @@ using UnityEngine.UI;
 
 public class BoardTile : MonoBehaviour, IPointerClickHandler
 {
-    [SerializeField] Image m_Image;
+    [SerializeField] Image m_HoverImage;
     [SerializeField] Color m_BaseColor;
     [SerializeField] Color m_HighlightColor;
+    [SerializeField] Color m_MoveableColor;
     [SerializeField] Color m_SelectedColor;
 
     private Vector2 m_BoardPosition;
@@ -16,12 +17,11 @@ public class BoardTile : MonoBehaviour, IPointerClickHandler
     public Vector2 BoardPosition => m_BoardPosition;
     public PawnController PieceController => m_PieceController;
 
-    private float m_Life;
-
     public void Init(Vector2 boardPosition, ETeam promotionalTileFor)
     {
         m_BoardPosition = boardPosition;
         m_PromotionalTileFor = promotionalTileFor;
+        SetColor(EColorType.None);
     }
 
     public void OnPointerClick(PointerEventData pEventData)
@@ -29,27 +29,23 @@ public class BoardTile : MonoBehaviour, IPointerClickHandler
         BoardManager.Instance.ClickOnTile(this);
     }
 
-    public void SetHighlight(bool isOn)
+    public void SetColor(EColorType pType)
     {
-        if (isOn)
+        switch (pType)
         {
-            m_Image.color = m_HighlightColor;
-        }
-        else
-        {
-            m_Image.color = m_BaseColor;
-        }
-    }
+            case EColorType.None:
+                m_HoverImage.color = m_BaseColor;
+                break;
+            case EColorType.Highlight:
+                m_HoverImage.color = m_HighlightColor;
+                break;
+            case EColorType.Select:
+                m_HoverImage.color = m_SelectedColor;
+                break;
+            case EColorType.Moveable:
+                m_HoverImage.color = m_MoveableColor;
+                break;
 
-    public void SetSelected(bool isSelected)
-    {
-        if (isSelected)
-        {
-            m_Image.color = m_SelectedColor;
-        }
-        else
-        {
-            m_Image.color = m_BaseColor;
         }
     }
 
@@ -66,8 +62,18 @@ public class BoardTile : MonoBehaviour, IPointerClickHandler
         m_PieceController = pieceController;
         m_PieceController.transform.position = new Vector3(transform.position.x, transform.position.y, -2);
         m_PieceController.transform.SetParent(gameObject.transform);
+        m_PieceController.transform.SetAsFirstSibling();
+        m_PieceController.SetPosition(m_BoardPosition);
 
         if (m_PromotionalTileFor != ETeam.None && m_PromotionalTileFor == m_PieceController.Team)
             m_PieceController.Promote();
     }
+}
+
+public enum EColorType
+{
+    None,
+    Highlight,
+    Select,
+    Moveable
 }

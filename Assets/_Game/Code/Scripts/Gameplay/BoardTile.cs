@@ -68,6 +68,12 @@ public class BoardTile : MonoBehaviour, IPointerClickHandler
         if (m_PromotionalTileFor != ETeam.None && m_PromotionalTileFor == m_PieceController.Team)
             m_PieceController.Promote();
     }
+
+    public void Clear()
+    {
+        SetColor(EColorType.None);
+        m_PieceController = null;
+    }
 }
 
 public enum EColorType

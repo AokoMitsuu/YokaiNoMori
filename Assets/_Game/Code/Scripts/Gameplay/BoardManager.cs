@@ -20,6 +20,7 @@ public class BoardManager : MonoBehaviour
 
     [Header("Settings")]
     [SerializeField] private List<Sprite> m_BoardList = new();
+    [SerializeField] private VictoryRuleSo m_Rule;
 
     private List<PawnController> m_Player1 = new();
     private List<PawnController> m_Player2 = new();
@@ -192,11 +193,13 @@ public class BoardManager : MonoBehaviour
     }
     private void CheckWin() //TODO rework : Victory if the enemy "king" is taken
     {
-        if (m_Player1.Count != 0 && m_Player2.Count != 0)
+        ETeam winner = m_Rule.CheckVictory(m_Player1, m_Player2);
+
+        if (winner == ETeam.None)
             return;
-        else if (m_Player1.Count == 0)
+        else if (winner == ETeam.Player1)
             Debug.Log("Player2 Won");
-        else if (m_Player2.Count == 0)
+        else if (winner == ETeam.Player2)
             Debug.Log("Player1 Won");
 
         Clear();
@@ -212,6 +215,9 @@ public class BoardManager : MonoBehaviour
 
         foreach (var player in m_Player2)
             Destroy(player.gameObject);
+
+        foreach (var tile in m_Tiles)
+            tile.Value.Clear();
 
         m_Player1.Clear();
         m_Player2.Clear();

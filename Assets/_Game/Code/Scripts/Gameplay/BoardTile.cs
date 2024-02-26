@@ -1,8 +1,10 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
-public class BoardTile : MonoBehaviour
+public class BoardTile : MonoBehaviour, IPointerClickHandler
 {
-    [SerializeField] SpriteRenderer m_SpriteRenderer;
+    [SerializeField] Image m_Image;
     [SerializeField] Color m_BaseColor;
     [SerializeField] Color m_HighlightColor;
     [SerializeField] Color m_SelectedColor;
@@ -14,13 +16,15 @@ public class BoardTile : MonoBehaviour
     public Vector2 BoardPosition => m_BoardPosition;
     public PawnController PieceController => m_PieceController;
 
+    private float m_Life;
+
     public void Init(Vector2 boardPosition, ETeam promotionalTileFor)
     {
         m_BoardPosition = boardPosition;
         m_PromotionalTileFor = promotionalTileFor;
     }
 
-    private void OnMouseDown()
+    public void OnPointerClick(PointerEventData pEventData)
     {
         BoardManager.Instance.ClickOnTile(this);
     }
@@ -29,11 +33,11 @@ public class BoardTile : MonoBehaviour
     {
         if (isOn)
         {
-            m_SpriteRenderer.color = m_HighlightColor;
+            m_Image.color = m_HighlightColor;
         }
         else
         {
-            m_SpriteRenderer.color = m_BaseColor;
+            m_Image.color = m_BaseColor;
         }
     }
 
@@ -41,11 +45,11 @@ public class BoardTile : MonoBehaviour
     {
         if (isSelected)
         {
-            m_SpriteRenderer.color = m_SelectedColor;
+            m_Image.color = m_SelectedColor;
         }
         else
         {
-            m_SpriteRenderer.color = m_BaseColor;
+            m_Image.color = m_BaseColor;
         }
     }
 
@@ -61,6 +65,7 @@ public class BoardTile : MonoBehaviour
 
         m_PieceController = pieceController;
         m_PieceController.transform.position = new Vector3(transform.position.x, transform.position.y, -2);
+        m_PieceController.transform.SetParent(gameObject.transform);
 
         if (m_PromotionalTileFor != ETeam.None && m_PromotionalTileFor == m_PieceController.Team)
             m_PieceController.Promote();

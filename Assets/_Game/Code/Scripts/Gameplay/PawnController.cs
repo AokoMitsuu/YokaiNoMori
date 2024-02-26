@@ -1,10 +1,11 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PawnController : MonoBehaviour
 {
     [SerializeField] private PawnSo m_PawnSo;
     [SerializeField] private ETeam m_Team;
-    [SerializeField] private SpriteRenderer m_SpriteRenderer;
+    [SerializeField] private Image m_Image;
 
     public PawnSo PawnSo => m_PawnSo;
     public ETeam Team => m_Team;
@@ -13,7 +14,7 @@ public class PawnController : MonoBehaviour
     {
         m_Team = team;
         m_PawnSo = pawn;
-        m_SpriteRenderer.sprite = pawn.Sprite;
+        m_Image.sprite = pawn.Sprite;
         transform.eulerAngles = team == ETeam.Player1 ? new Vector3(0f, 0f, 0f) : new Vector3(0f, 0f, 180f);
     }
 

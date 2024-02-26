@@ -1,11 +1,12 @@
 using NaughtyAttributes;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BoardManager : MonoBehaviour
 {
     [Header("Board")]
-    [SerializeField] private SpriteRenderer m_BoardImage;
+    [SerializeField] private Image m_BoardImage;
     [SerializeField] private BoardTile m_TilePrefab;
     [SerializeField] private float m_TileSize;
     [SerializeField] private float m_TileSpacing;
@@ -147,7 +148,7 @@ public class BoardManager : MonoBehaviour
         float centeredXOffset = xOffset - totalWidth / 2 + m_TileSize / 2;
         float centeredYOffset = yOffset - totalHeight / 2 + m_TileSize / 2;
 
-        return new Vector3(centeredXOffset, centeredYOffset, -1);
+        return new Vector3(centeredXOffset + m_BoardImage.rectTransform.rect.width / 2.0f, centeredYOffset + m_BoardImage.rectTransform.rect.height / 2.0f, -1);
     }
     private void CheckWin() //TODO rework : Victory if the enemy "king" is taken
     {
@@ -186,7 +187,7 @@ public class BoardManager : MonoBehaviour
             for (int y = 0; y < m_Scenario.BoardSize.y; y++)
             {
                 BoardTile tile = Instantiate(m_TilePrefab, BoardPositionToWorldPosition(x, y), Quaternion.identity);
-                tile.transform.localScale = new Vector3(m_TileSize, m_TileSize, 1);
+                //tile.transform.localScale = new Vector3(m_TileSize, m_TileSize, 1);
                 tile.transform.SetParent(m_BoardImage.transform);
                 tile.Init(new Vector2(x, y), y == 0 ? ETeam.Player2 : y == m_Scenario.BoardSize.y - 1 ? ETeam.Player1 : ETeam.None);
 

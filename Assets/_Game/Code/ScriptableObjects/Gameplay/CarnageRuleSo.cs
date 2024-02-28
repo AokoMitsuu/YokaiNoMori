@@ -5,13 +5,13 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Rules/Carnage", fileName = "Carnage")]
 public class CarnageRuleSo : VictoryRuleSo
 {
-    public override ETeam CheckVictory(List<PawnController> pPlayer1, List<PawnController> pPlayer2)
+    public override Team CheckVictory(List<Pawn> pPlayer1, List<Pawn> pPlayer2)
     {
         if (pPlayer1.Count == 0)
-            return ETeam.Player2;
+            return Team.Player2;
         else if (pPlayer2.Count == 0)
-            return ETeam.Player1;
+            return Team.Player1;
         else
-            return ETeam.None;
+            return Team.None;
     }
 }

@@ -2,13 +2,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using System.Linq;
-using System.Collections;
 using DG.Tweening;
+using NaughtyAttributes;
+using TMPro;
+using UnityEngine.UI;
+using System.Data;
 
 public class Board : MonoBehaviour
 {
     [Header("Items")]
     [SerializeField] private SpriteRenderer m_BoardSprite;
+    [SerializeField] private Transform m_ToRotate;
     [SerializeField] private Transform m_BoardParent;
     [SerializeField] private Tile m_TilePrefab;
     [SerializeField] private Pawn m_PawnPrefab;
@@ -16,6 +20,8 @@ public class Board : MonoBehaviour
     [SerializeField] private List<MusicSo> m_BackgroundMusics = new();
     [SerializeField] private List<Tile> P1_InReserveTiles;
     [SerializeField] private List<Tile> P2_InReserveTiles;
+    [SerializeField] private Image m_TurnLabel;
+    [SerializeField] private TMP_Text m_TurnText;
 
     [Header("Settings")]
     [SerializeField] private ScenarioSo m_Scenario;
@@ -23,6 +29,17 @@ public class Board : MonoBehaviour
     [SerializeField] private float m_TileSize;
     [SerializeField] private float m_TileSpacing;
     [SerializeField] private float m_RotateDelay;
+    [SerializeField] private Color P1_Color;
+    [SerializeField] private Color P2_Color;
+    [SerializeField] private AnimationCurve m_LabelCurve;
+
+    [SerializeField, Foldout("Sound")] private SoundSo m_SoundBeginTurn;
+    [SerializeField, Foldout("Sound")] private SoundSo m_SoundEndTurn;
+    [SerializeField, Foldout("Sound")] private SoundSo m_SoundCapture;
+    [SerializeField, Foldout("Sound")] private SoundSo m_SoundDrop;
+    [SerializeField, Foldout("Sound")] private SoundSo m_SoundMove;
+    [SerializeField, Foldout("Sound")] private SoundSo m_SoundSelect;
+    [SerializeField, Foldout("Sound")] private SoundSo m_SoundToReserve;
 
     [Header("Dictionary")]
     [SerializeField] private SerializedDictionary<Vector2, Tile> m_BoardInfo = new();
@@ -41,6 +58,8 @@ public class Board : MonoBehaviour
     private Tile m_CurrentSelectedTile;
     private List<Tile> m_ReachableTiles = new();
     private Tween m_Rotation;
+    private Sequence m_LabelMove;
+    private bool m_IsReserve;
 
     #region Setup
 
@@ -66,6 +85,7 @@ public class Board : MonoBehaviour
         }
 
         m_Rotation.Kill(false);
+        m_LabelMove.Kill(false);
         m_Rotation = null;
 
         m_BoardParent.transform.rotation = Quaternion.identity;
@@ -151,10 +171,11 @@ public class Board : MonoBehaviour
 
     public void OnTileClick(Tile pTile, bool pIsReserve)
     {
-        ProcessAction(pTile, pIsReserve);
+        m_IsReserve = pIsReserve;
+        ProcessAction(pTile);
     }
 
-    private void ProcessAction(Tile pTile, bool pIsReserve)
+    private void ProcessAction(Tile pTile)
     {
         Pawn pawn = pTile.Pawn;
 
@@ -164,11 +185,11 @@ public class Board : MonoBehaviour
         }
         else if (m_BoardState == BoardState.P1_PawnSelection && pawn != null && pawn.Team == Team.Player1)
         {
-            SelectPawn(pTile, pIsReserve);
+            SelectPawn(pTile);
         }
         else if (m_BoardState == BoardState.P2_PawnSelection && pawn != null && pawn.Team == Team.Player2)
         {
-            SelectPawn(pTile, pIsReserve);
+            SelectPawn(pTile);
         }
         else if ((m_BoardState == BoardState.P1_PawnMove || m_BoardState == BoardState.P2_PawnMove) && m_ReachableTiles.Contains(pTile))
         {
@@ -182,13 +203,15 @@ public class Board : MonoBehaviour
         }
     }
 
-    private void SelectPawn(Tile pTile, bool pIsReserve)
+    private void SelectPawn(Tile pTile)
     {
         m_CurrentSelectedTile = pTile;
 
         m_CurrentSelectedTile.SetState(TileState.Selected);
 
-        m_ReachableTiles.AddRange(GenerateReachableTileList(pTile, pIsReserve));
+        m_ReachableTiles.AddRange(GenerateReachableTileList(pTile));
+
+        m_SoundSelect.Play();
 
         foreach (Tile reachableTile in m_ReachableTiles)
         {
@@ -198,11 +221,11 @@ public class Board : MonoBehaviour
         m_BoardState = m_BoardState == BoardState.P1_PawnSelection ? BoardState.P1_PawnMove : BoardState.P2_PawnMove;
     }
 
-    private List<Tile> GenerateReachableTileList(Tile pTile, bool pIsReserve)
+    private List<Tile> GenerateReachableTileList(Tile pTile)
     {
         List<Tile> reachableTileList = new();
 
-        if (pIsReserve)
+        if (m_IsReserve)
         {
             foreach (KeyValuePair<Vector2, Tile> tile in m_BoardInfo)
             {
@@ -259,6 +282,13 @@ public class Board : MonoBehaviour
         if (pTargetTile.TeamBackRow != Team.None && pTargetTile.TeamBackRow != pPawn.Team && !m_CurrentSelectedTile.IsReserve)
             pPawn.Promote();
 
+        if(m_IsReserve)
+            m_SoundDrop.Play();
+        else
+            m_SoundMove.Play();
+
+        m_SoundEndTurn.Play();
+
         ClearMoveState();
         
         if (m_BoardState == BoardState.P1_PawnMove)
@@ -281,17 +311,19 @@ public class Board : MonoBehaviour
                 P1_OnBoardPawns.Remove(pPawn);
                 P2_InReservePawns.Add(pPawn);
                 P2_InReserveTiles.First((x) => x.Pawn == null).Pawn = pPawn;
-                pPawn.Demote();
                 pPawn.Team = Team.Player2;
                 break;
             case Team.Player2:
                 P2_OnBoardPawns.Remove(pPawn);
                 P1_InReservePawns.Add(pPawn);
                 P1_InReserveTiles.First((x) => x.Pawn == null).Pawn = pPawn;
-                pPawn.Demote();
                 pPawn.Team = Team.Player1;
                 break;
         }
+
+        pPawn.Demote();
+        m_SoundCapture.Play();
+        m_SoundToReserve.Play();
     }
 
     private void ClearMoveState()
@@ -340,7 +372,28 @@ public class Board : MonoBehaviour
     private void RotateBoard(BoardState pNewState)
     {
         m_BoardState = BoardState.Idle;
-        m_Rotation = m_BoardParent.transform.DORotate(new Vector3(0, 0, 180f), m_RotateDelay, RotateMode.LocalAxisAdd).OnComplete(() => { m_BoardState = pNewState; });
+
+        if (pNewState == BoardState.P1_PawnSelection)
+        {
+            m_TurnText.text = "Au tour du joueur 1";
+            m_TurnLabel.color = P1_Color;
+        }
+        else
+        {
+            m_TurnText.text = "Au tour du joueur 2";
+            m_TurnLabel.color = P2_Color;
+        }
+
+        m_Rotation = m_ToRotate.transform.DORotate(new Vector3(0, 0, 180f), m_RotateDelay, RotateMode.LocalAxisAdd).SetEase(Ease.InOutBack).OnComplete(() => { m_BoardState = pNewState; m_SoundBeginTurn.Play(); });
+
+        m_LabelMove.Kill(true);
+
+        m_TurnLabel.rectTransform.position = new Vector3(-Screen.width, m_TurnLabel.rectTransform.position.y, m_TurnLabel.rectTransform.position.z);
+
+        m_LabelMove = DOTween.Sequence();
+        m_LabelMove.Append(m_TurnLabel.rectTransform.DOAnchorPosX(0, m_RotateDelay).SetEase(Ease.OutExpo));
+        m_LabelMove.AppendInterval(0);
+        m_LabelMove.Append(m_TurnLabel.rectTransform.DOAnchorPosX(Screen.width, m_RotateDelay).SetEase(Ease.OutExpo));
     }
     #endregion
 

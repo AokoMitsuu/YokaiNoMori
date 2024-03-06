@@ -5,11 +5,17 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Rules/Carnage", fileName = "Carnage")]
 public class CarnageRuleSo : VictoryRuleSo
 {
-    public override Team CheckVictory(List<Pawn> pPlayer1, List<Pawn> pPlayer2)
+    public override Team CheckVictory(
+        Dictionary<Vector2, TileData> pBoardState, 
+        List<Pawn> pP1_OnBoardPawns, 
+        List<Pawn> pP2_OnBoardPawns, 
+        List<Pawn> pP1_InReservePawns, 
+        List<Pawn> pP2_InReservePawns
+    )
     {
-        if (pPlayer1.Count == 0)
+        if (pP1_OnBoardPawns.Count == 0)
             return Team.Player2;
-        else if (pPlayer2.Count == 0)
+        else if (pP2_OnBoardPawns.Count == 0)
             return Team.Player1;
         else
             return Team.None;

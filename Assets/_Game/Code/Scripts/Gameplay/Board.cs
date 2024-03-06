@@ -33,8 +33,7 @@ public class Board : MonoBehaviour
 
     private int m_TotalCells;
     private BoardState m_BoardState;
-    private Pawn m_CurrentSelectedPawn;
-    private Tile m_CurrentSelectedTile;
+    private TileData m_CurrentSelectedTileData;
     private List<Tile> m_ReachableTiles = new();
 
     #region Setup
@@ -43,9 +42,23 @@ public class Board : MonoBehaviour
     {
         foreach (KeyValuePair<Vector2, TileData> tileData in m_BoardInfo)
         {
-            Destroy(tileData.Value.Pawn.gameObject);
-            Destroy(tileData.Value.Tile.gameObject);
+            if(tileData.Value.Pawn != null)
+                Destroy(tileData.Value.Pawn.gameObject);
+
+            if(tileData.Value.Tile != null)
+                Destroy(tileData.Value.Tile.gameObject);
         }
+
+        foreach(Pawn pawn in P1_InReservePawns)
+        {
+            Destroy(pawn.gameObject);
+        }
+
+        foreach (Pawn pawn in P2_InReservePawns)
+        {
+            Destroy(pawn.gameObject);
+        }
+
         m_BoardInfo.Clear();
         P1_OnBoardPawns.Clear();
         P2_OnBoardPawns.Clear();
@@ -108,7 +121,6 @@ public class Board : MonoBehaviour
         }
 
         m_BoardState = BoardState.P1_PawnSelection;
-        //GenerateMoveableCard();
     }
 
     private void Start()
@@ -149,7 +161,8 @@ public class Board : MonoBehaviour
         }
         else if ((m_BoardState == BoardState.P1_PawnMove || m_BoardState == BoardState.P2_PawnMove) && m_ReachableTiles.Contains(tile))
         {
-            MovePawnTo(m_CurrentSelectedPawn, pTargetPos);
+            MovePawnTo(m_CurrentSelectedTileData.Pawn, pTargetPos);
+            CheckWin();
         }
         else if(m_BoardState == BoardState.P1_PawnMove || m_BoardState == BoardState.P2_PawnMove)
         {
@@ -160,10 +173,9 @@ public class Board : MonoBehaviour
 
     private void SelectPawn(TileData pTileData, Vector2 pTargetPos)
     {
-        m_CurrentSelectedPawn = pTileData.Pawn;
-        m_CurrentSelectedTile = pTileData.Tile;
+        m_CurrentSelectedTileData = pTileData;
 
-        m_CurrentSelectedTile.SetState(TileState.Selected);
+        m_CurrentSelectedTileData.Tile.SetState(TileState.Selected);
 
         m_ReachableTiles.AddRange(GenerateReachableTileList(pTileData, pTargetPos));
         foreach (Tile reachableTile in m_ReachableTiles)
@@ -211,6 +223,11 @@ public class Board : MonoBehaviour
             CapturePawn(tileData.Pawn);
         }
 
+        if(m_CurrentSelectedTileData != null)
+        {
+            m_CurrentSelectedTileData.Pawn = null;
+        }
+
         tileData.Pawn = pPawn;
         pPawn.transform.SetParent(tileData.Tile.transform);
         pPawn.transform.position = tileData.Tile.transform.position;
@@ -226,11 +243,13 @@ public class Board : MonoBehaviour
         switch (pPawn.Team)
         {
             case Team.Player1:
+                P1_OnBoardPawns.Remove(pPawn);
                 P2_InReservePawns.Add(pPawn);
                 pPawn.transform.SetParent(m_P2ReserveParent);
                 pPawn.Team = Team.Player2;
                 break;
             case Team.Player2:
+                P2_OnBoardPawns.Remove(pPawn);
                 P1_InReservePawns.Add(pPawn);
                 pPawn.transform.SetParent(m_P1ReserveParent);
                 pPawn.Team = Team.Player1;
@@ -241,9 +260,8 @@ public class Board : MonoBehaviour
 
     private void ClearMoveState()
     {
-        m_CurrentSelectedTile?.SetState(TileState.None);
-        m_CurrentSelectedTile = null;
-        m_CurrentSelectedPawn = null;
+        m_CurrentSelectedTileData?.Tile?.SetState(TileState.None);
+        m_CurrentSelectedTileData = null;
 
         foreach (var reachableTile in m_ReachableTiles)
         {
@@ -251,6 +269,16 @@ public class Board : MonoBehaviour
         }
 
         m_ReachableTiles.Clear();
+    }
+
+
+    private void CheckWin()
+    {
+        Team winner = m_VictoryRule.CheckVictory(m_BoardInfo, P1_OnBoardPawns, P2_OnBoardPawns, P1_InReservePawns, P2_InReservePawns);
+        if (winner == Team.None) return;
+
+        Debug.Log(winner);
+        SetupGame();
     }
 
     #endregion

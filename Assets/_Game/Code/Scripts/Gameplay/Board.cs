@@ -4,6 +4,8 @@ using UnityEngine.UI;
 using UnityEngine.Rendering;
 using NaughtyAttributes;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 public class Board : MonoBehaviour
 {
@@ -34,6 +36,8 @@ public class Board : MonoBehaviour
     private List<Pawn> P1_InReservePawns = new();
     private List<Pawn> P2_InReservePawns = new();
 
+    private List<string> P1_History = new();
+    private List<string> P2_History = new();
 
     private int m_TotalCells;
     private BoardState m_BoardState;
@@ -93,6 +97,7 @@ public class Board : MonoBehaviour
             for (int y = 0; y < m_Scenario.BoardSize.y; y++)
             {
                 Tile tile = Instantiate(m_TilePrefab, BoardPositionToWorldPosition(x, y), Quaternion.identity);
+                tile.name = $"{x}:{y}";
                 tile.transform.SetParent(m_BoardParent);
                 tile.Init(y == 0 ? Team.Player1 : y == m_Scenario.BoardSize.y - 1 ? Team.Player2 : Team.None, this);
 
@@ -251,7 +256,16 @@ public class Board : MonoBehaviour
 
         ClearMoveState();
 
-        m_BoardState = m_BoardState == BoardState.P1_PawnMove ? BoardState.P2_PawnSelection : BoardState.P1_PawnSelection;
+        if (m_BoardState == BoardState.P1_PawnMove)
+        {
+            m_BoardState = BoardState.P2_PawnSelection;
+            AddActionHistory(P1_History ,$"{pPawn.PawnSo.name}-{pTargetTile.name}");
+        }
+        else
+        {
+            m_BoardState = BoardState.P1_PawnSelection;
+            AddActionHistory(P2_History, $"{pPawn.PawnSo.name}-{pTargetTile.name}");
+        }
     }
 
     private void CapturePawn(Pawn pPawn)
@@ -288,11 +302,32 @@ public class Board : MonoBehaviour
 
     private void CheckWin()
     {
-        Team winner = m_VictoryRule.CheckVictory(m_BoardInfo, P1_OnBoardPawns, P2_OnBoardPawns, P1_InReservePawns, P2_InReservePawns);
-        if (winner == Team.None) return;
+        if(CheckDraw()) // DRAW
+        {
+            Debug.Log("DRAW");
+            SetupGame();
+        }
+        else
+        {
+            Team winner = m_VictoryRule.CheckVictory(m_BoardInfo, P1_OnBoardPawns, P2_OnBoardPawns, P1_InReservePawns, P2_InReservePawns);
+            if (winner == Team.None) return;
 
-        Debug.Log(winner);
-        SetupGame();
+            Debug.Log(winner);
+            SetupGame();
+        }
+
+    }
+    private bool CheckDraw()
+    {
+        if (P1_History.Count < 6 || P2_History.Count < 6) return false;
+
+        bool player1ActionA = P1_History[0] == P1_History[2] && P1_History[2] == P1_History[4];
+        bool player1ActionB = P1_History[1] == P1_History[3] && P1_History[3] == P1_History[5];
+
+        bool player2ActionA = P2_History[0] == P2_History[2] && P2_History[2] == P2_History[4];
+        bool player2ActionB = P2_History[1] == P2_History[3] && P2_History[3] == P2_History[5];
+
+        return player1ActionA && player1ActionB && player2ActionA && player2ActionB;
     }
 
     #endregion
@@ -312,23 +347,15 @@ public class Board : MonoBehaviour
 
         return new Vector3(centeredXOffset + m_BoardImage.rectTransform.rect.width / 2.0f, centeredYOffset + m_BoardImage.rectTransform.rect.height / 2.0f, -1);
     }
-    private Vector2 WorldPositionToBoardPosition(Vector2 pWorldPos)
+
+    private void AddActionHistory(List<string> pPlayerHistory, string action)
     {
-        // Calcul des offsets centrés à l'inverse
-        float centeredXOffset = pWorldPos.x - m_BoardImage.rectTransform.rect.width / 2.0f;
-        float centeredYOffset = pWorldPos.y - m_BoardImage.rectTransform.rect.height / 2.0f;
-
-        // Retrait des demi-tailles de tuile pour obtenir le début du grid
-        float startX = centeredXOffset + (m_Scenario.BoardSize.x * m_TileSize + (m_Scenario.BoardSize.x - 1) * m_TileSpacing) / 2 - m_TileSize / 2;
-        float startY = centeredYOffset + (m_Scenario.BoardSize.y * m_TileSize + (m_Scenario.BoardSize.y - 1) * m_TileSpacing) / 2 - m_TileSize / 2;
-
-        // Conversion des positions en coordonnées de grille
-        int x = Mathf.RoundToInt(startX / (m_TileSize + m_TileSpacing));
-        int y = Mathf.RoundToInt(startY / (m_TileSize + m_TileSpacing));
-
-        return new Vector2(x, y);
+        pPlayerHistory.Add(action);
+        if(pPlayerHistory.Count > 6)
+        {
+            pPlayerHistory.RemoveAt(0);
+        }
     }
-
     #endregion
 }
 

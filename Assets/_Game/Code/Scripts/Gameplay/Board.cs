@@ -3,7 +3,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Rendering;
 using NaughtyAttributes;
-using System.Linq;
 
 public class Board : MonoBehaviour
 {
@@ -15,6 +14,7 @@ public class Board : MonoBehaviour
     [SerializeField] private Tile m_TilePrefab;
     [SerializeField] private Pawn m_PawnPrefab;
     [SerializeField] private List<Sprite> m_BackgroundList = new();
+    [SerializeField] private List<MusicSo> m_BackgroundMusics = new();
 
     [Header("Settings")]
     [SerializeField] private ScenarioSo m_Scenario;
@@ -64,7 +64,9 @@ public class Board : MonoBehaviour
     }
     private void SetupBackground()
     {
-        m_BoardImage.sprite = m_BackgroundList[Random.Range(0, m_BackgroundList.Count)];
+        int randomNumber = Random.Range(0, m_BackgroundList.Count);
+        m_BoardImage.sprite = m_BackgroundList[randomNumber];
+        m_BackgroundMusics[randomNumber]?.Play();
     }
     private void SetupTiles()
     {
@@ -290,255 +292,6 @@ public class Board : MonoBehaviour
     {
         MovePawnTo(P2_OnBoardPawns[0], Vector2.zero);
     }
-}
-
-public struct Temp
-{
-    //private List<Tile> m_ReachableTiles = new();
-    //private List<Tile> m_PlayerTiles = new();
-
-    //private Tile m_AcutalTile = null;
-    //private Pawn m_AcutalPawn = null;
-
-    //private BoardState m_BoardState;
-    //private int m_TotalCells;
-
-    //public static Board Instance;
-
-    //public void ClickOnTile(Tile tile)
-    //{
-    //    if (m_BoardState == BoardState.Idle) return;
-
-    //    if(m_BoardState == BoardState.P1_PawnSelection && tile.PieceController != null && tile.PieceController.Team == Team.Player1)
-    //    {
-    //        SelectPawn(tile);
-    //    }
-    //    else if (m_BoardState == BoardState.P2_PawnSelection && tile.PieceController != null && tile.PieceController.Team == Team.Player2)
-    //    {
-    //        SelectPawn(tile);
-    //    }
-    //    else if ((m_BoardState == BoardState.P1_PawnMove || m_BoardState == BoardState.P2_PawnMove) && m_ReachableTiles.Contains(tile))
-    //    {
-    //        MovePawn(tile);
-    //    }
-    //    else if (m_BoardState == BoardState.P1_PawnMove || m_BoardState == BoardState.P2_PawnMove)
-    //    {
-    //        m_AcutalTile.SetColor(ColorType.None);
-    //        m_AcutalTile = null;
-    //        m_AcutalPawn = null;
-    //        foreach (var reachableTile in m_ReachableTiles)
-    //        {
-    //            reachableTile.SetColor(ColorType.None);
-    //        }
-    //        m_ReachableTiles.Clear();
-
-    //        if (m_BoardState == BoardState.P1_PawnMove)
-    //            m_BoardState = BoardState.P1_PawnSelection;
-    //        else
-    //            m_BoardState = BoardState.P2_PawnSelection;
-    //    }
-
-    //    GenerateMoveableCard();
-    //}
-    //private void SelectPawn(Tile tile)
-    //{
-    //    m_AcutalTile = tile;
-    //    m_AcutalTile.SetColor(ColorType.Select);
-    //    m_AcutalPawn = tile.PieceController;
-    //    m_ReachableTiles.AddRange(GenerateReachableTileList(m_AcutalPawn));
-    //    foreach (var reachableTile in m_ReachableTiles)
-    //    {
-    //        reachableTile.SetColor(ColorType.Highlight);
-    //    }
-
-    //    if(m_BoardState == BoardState.P1_PawnSelection)
-    //        m_BoardState = BoardState.P1_PawnMove;
-    //    else
-    //        m_BoardState = BoardState.P2_PawnMove;
-    //}
-    //private void MovePawn(Tile tile)
-    //{
-    //    m_AcutalTile.RemovePiece();
-    //    m_AcutalTile.SetColor(ColorType.None);
-    //    tile.SetPawn(m_AcutalPawn);
-    //    m_AcutalPawn = null;
-    //    foreach (var reachableTile in m_ReachableTiles)
-    //    {
-    //        reachableTile.SetColor(ColorType.None);
-    //    }
-    //    m_ReachableTiles.Clear();
-
-    //    if (m_BoardState == BoardState.P1_PawnMove)
-    //        m_BoardState = BoardState.P2_PawnSelection;
-    //    else
-    //        m_BoardState = BoardState.P1_PawnSelection;
-    //}
-    //public void RemovePiece(Pawn piece)
-    //{
-    //    if (m_Player1Pawns.Contains(piece))
-    //        m_Player1Pawns.Remove(piece);
-    //    else
-    //        m_Player2Pawns.Remove(piece);
-
-    //    Destroy(piece.gameObject);
-    //    CheckWin();
-    //}
-
-    //private void GenerateMoveableCard()
-    //{
-    //    foreach (var tile in m_PlayerTiles)
-    //    {
-    //        tile.SetColor(ColorType.None);
-    //    }
-    //    m_PlayerTiles.Clear();
-
-    //    if (m_BoardState == BoardState.P1_PawnSelection || m_BoardState == BoardState.P1_PawnMove)
-    //    {
-    //        foreach (var pawn in m_Player1Pawns)
-    //        {
-    //            if (GenerateReachableTileList(pawn).Count > 0 && m_Tiles.TryGetValue(pawn.Position, out var tile))
-    //            {
-    //                m_PlayerTiles.Add(tile);
-    //                tile.SetColor(ColorType.Moveable);
-    //            }
-    //        }
-    //    }
-    //    else
-    //    {
-    //        foreach (var pawn in m_Player2Pawns)
-    //        {
-    //            if (GenerateReachableTileList(pawn).Count > 0 && m_Tiles.TryGetValue(pawn.Position, out var tile))
-    //            {
-    //                m_PlayerTiles.Add(tile);
-    //                tile.SetColor(ColorType.Moveable);
-    //            }
-    //        }
-    //    }
-
-    //}
-    //private List<Tile> GenerateReachableTileList(Pawn piece)
-    //{
-    //    List<Tile> tempList = new();
-    //    foreach (Vector2 range in piece.PawnSo.Ranges)
-    //    {
-    //        Vector2 newPos = Vector2.zero;
-
-    //        if (piece.Team == Team.Player1)
-    //            newPos = new Vector2(piece.Position.x + range.x, piece.Position.y + range.y);
-    //        else
-    //            newPos = new Vector2(piece.Position.x + range.x, piece.Position.y - range.y);
-
-    //        if (m_Tiles.TryGetValue(newPos, out var tile) && (tile.PieceController == null || tile.PieceController.Team != piece.Team))
-    //            tempList.Add(tile);
-    //    }
-    //    return tempList;
-    //}
-    //private Vector3 BoardPositionToWorldPosition(int x, int y)
-    //{
-    //    float xOffset = x * (m_TileSize + m_TileSpacing);
-    //    float yOffset = y * (m_TileSize + m_TileSpacing);
-
-    //    float totalWidth = (m_Scenario.BoardSize.x * m_TileSize) + ((m_Scenario.BoardSize.x - 1) * m_TileSpacing);
-    //    float totalHeight = (m_Scenario.BoardSize.y * m_TileSize) + ((m_Scenario.BoardSize.y - 1) * m_TileSpacing);
-
-    //    float centeredXOffset = xOffset - totalWidth / 2 + m_TileSize / 2;
-    //    float centeredYOffset = yOffset - totalHeight / 2 + m_TileSize / 2;
-
-    //    return new Vector3(centeredXOffset + m_BoardImage.rectTransform.rect.width / 2.0f, centeredYOffset + m_BoardImage.rectTransform.rect.height / 2.0f, -1);
-    //}
-    //private void CheckWin() //TODO rework : Victory if the enemy "king" is taken
-    //{
-    //    Team winner = m_Rule.CheckVictory(m_Player1Pawns, m_Player2Pawns);
-
-    //    if (winner == Team.None) return;
-
-    //    Debug.Log(winner);
-
-    //    SetupGame();
-    //}
-
-    //#region Init
-
-
-    //private void Clear()
-    //{
-    //    foreach (var player in m_Player1Pawns)
-    //        Destroy(player.gameObject);
-
-    //    foreach (var player in m_Player2Pawns)
-    //        Destroy(player.gameObject);
-
-    //    foreach (var tile in m_Tiles)
-    //        tile.Value.Clear();
-
-    //    m_Player1Pawns.Clear();
-    //    m_Player2Pawns.Clear();
-    //}
-    //private void SetupGame()
-    //{
-    //    Clear();
-
-    //    SetupBackground();
-
-    //    SetupTiles();
-
-    //    m_TotalCells = (int)m_Scenario.BoardSize.x * (int)m_Scenario.BoardSize.y;
-
-    //    SetupPawns();
-    //}
-    //[Button] private void SetupBackground()
-    //{
-    //    m_BoardImage.sprite = m_BoardList[Random.Range(0, m_BoardList.Count)];
-    //}
-    //private void SetupTiles()
-    //{
-    //    for (int x = 0; x < m_Scenario.BoardSize.x; x++)
-    //    {
-    //        for (int y = 0; y < m_Scenario.BoardSize.y; y++)
-    //        {
-    //            Tile tile = Instantiate(m_TilePrefab, BoardPositionToWorldPosition(x, y), Quaternion.identity);
-    //            tile.transform.SetParent(m_BoardImage.transform);
-    //            tile.Init(new Vector2(x, y), y == 0 ? Team.Player2 : y == m_Scenario.BoardSize.y - 1 ? Team.Player1 : Team.None);
-
-    //            m_Tiles.Add(new Vector2(x, y), tile);
-    //        }
-    //    }
-    //}
-    //private void SetupPawns()
-    //{
-    //    for (int i = 0; i < m_Scenario.Pieces.Count; i++)
-    //    {
-    //        if (m_Scenario.Pieces[i] == null) continue;
-
-    //        // PLAYER 1
-    //        var piece = Instantiate(m_PawnPrefab);
-    //        var pos = new Vector2(i % (int)m_Scenario.BoardSize.x, i / (int)m_Scenario.BoardSize.x);
-    //        piece.Init(Team.Player1, m_Scenario.Pieces[i], pos);
-    //        m_Tiles[pos].SetPawn(piece);
-    //        m_Player1Pawns.Add(piece);
-
-    //        // PLAYER 2
-    //        int reversedIndex = m_TotalCells - 1 - i;
-    //        piece = Instantiate(m_PawnPrefab);
-    //        pos = new Vector2(reversedIndex % (int)m_Scenario.BoardSize.x, reversedIndex / (int)m_Scenario.BoardSize.x);
-    //        piece.Init(Team.Player2, m_Scenario.Pieces[i], pos);
-    //        m_Tiles[pos].SetPawn(piece);
-    //        m_Player2Pawns.Add(piece);
-    //    }
-
-    //    m_BoardState = BoardState.P1_PawnSelection;
-    //    GenerateMoveableCard();
-    //}
-
-
-    //private void Start()
-    //{
-    //    Instance = this;
-
-    //    SetupGame();
-    //}
-
-    //#endregion
 }
 
 public enum BoardState

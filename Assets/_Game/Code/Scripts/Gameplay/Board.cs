@@ -58,14 +58,15 @@ public class Board : MonoBehaviour
 
         m_TotalCells = (int)m_Scenario.BoardSize.x * (int)m_Scenario.BoardSize.y;
 
-        SetupBackground();
+        SetupAmbience();
         SetupTiles();
         SetupPawns();
     }
-    private void SetupBackground()
+    private void SetupAmbience()
     {
         int randomNumber = Random.Range(0, m_BackgroundList.Count);
         m_BoardImage.sprite = m_BackgroundList[randomNumber];
+        App.Instance.AudioManager.StopAllMusics();
         m_BackgroundMusics[randomNumber]?.Play();
     }
     private void SetupTiles()

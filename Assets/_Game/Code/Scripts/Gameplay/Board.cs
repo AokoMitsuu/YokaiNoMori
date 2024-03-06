@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Rendering;
 using NaughtyAttributes;
+using System.Linq;
 
 public class Board : MonoBehaviour
 {
@@ -15,6 +16,8 @@ public class Board : MonoBehaviour
     [SerializeField] private Pawn m_PawnPrefab;
     [SerializeField] private List<Sprite> m_BackgroundList = new();
     [SerializeField] private List<MusicSo> m_BackgroundMusics = new();
+    [SerializeField] private List<Tile> P1_InReserveTiles;
+    [SerializeField] private List<Tile> P2_InReserveTiles;
 
     [Header("Settings")]
     [SerializeField] private ScenarioSo m_Scenario;
@@ -23,7 +26,7 @@ public class Board : MonoBehaviour
     [SerializeField] private float m_TileSpacing;
 
     [Header("Dictionary")]
-    [SerializeField] private SerializedDictionary<Vector2, TileData> m_BoardInfo = new();
+    [SerializeField] private SerializedDictionary<Vector2, Tile> m_BoardInfo = new();
 
     private List<Pawn> P1_OnBoardPawns = new();
     private List<Pawn> P2_OnBoardPawns = new();
@@ -31,22 +34,23 @@ public class Board : MonoBehaviour
     private List<Pawn> P1_InReservePawns = new();
     private List<Pawn> P2_InReservePawns = new();
 
+
     private int m_TotalCells;
     private BoardState m_BoardState;
-    private TileData m_CurrentSelectedTileData;
+    private Tile m_CurrentSelectedTile;
     private List<Tile> m_ReachableTiles = new();
 
     #region Setup
 
     private void Clear()
     {
-        foreach (KeyValuePair<Vector2, TileData> tileData in m_BoardInfo)
+        foreach (KeyValuePair<Vector2, Tile> tile in m_BoardInfo)
         {
-            if(tileData.Value.Pawn != null)
-                Destroy(tileData.Value.Pawn.gameObject);
+            if(tile.Value.Pawn != null)
+                Destroy(tile.Value.Pawn.gameObject);
 
-            if(tileData.Value.Tile != null)
-                Destroy(tileData.Value.Tile.gameObject);
+            if(tile.Value != null)
+                Destroy(tile.Value.gameObject);
         }
 
         foreach(Pawn pawn in P1_InReservePawns)
@@ -90,12 +94,16 @@ public class Board : MonoBehaviour
             {
                 Tile tile = Instantiate(m_TilePrefab, BoardPositionToWorldPosition(x, y), Quaternion.identity);
                 tile.transform.SetParent(m_BoardParent);
-                tile.Init(y == 0 ? Team.Player1 : y == m_Scenario.BoardSize.y - 1 ? Team.Player2 : Team.None);
+                tile.Init(y == 0 ? Team.Player1 : y == m_Scenario.BoardSize.y - 1 ? Team.Player2 : Team.None, this);
 
-                var tileData = new TileData();
-                tileData.Tile = tile;
-                m_BoardInfo.Add(new Vector2(x, y), tileData);
+                m_BoardInfo.Add(new Vector2(x, y), tile);
             }
+        }
+
+        for (int i = 0; i < P1_InReserveTiles.Count; i++)
+        {
+            P1_InReserveTiles[i].Init(Team.Player1, this);
+            P2_InReserveTiles[i].Init(Team.Player2, this);
         }
     }
     private void SetupPawns()
@@ -108,7 +116,7 @@ public class Board : MonoBehaviour
             var pawn = Instantiate(m_PawnPrefab);
             var pos = new Vector2(i % (int)m_Scenario.BoardSize.x, i / (int)m_Scenario.BoardSize.x);
             pawn.Init(m_Scenario.Pieces[i], Team.Player1);
-            MovePawnTo(pawn, pos);
+            MovePawnTo(pawn, m_BoardInfo[pos]);
             P1_OnBoardPawns.Add(pawn);
 
             // PLAYER 2
@@ -116,7 +124,7 @@ public class Board : MonoBehaviour
             pawn = Instantiate(m_PawnPrefab);
             pos = new Vector2(reversedIndex % (int)m_Scenario.BoardSize.x, reversedIndex / (int)m_Scenario.BoardSize.x);
             pawn.Init(m_Scenario.Pieces[i], Team.Player2);
-            MovePawnTo(pawn, pos);
+            MovePawnTo(pawn, m_BoardInfo[pos]);
             P2_OnBoardPawns.Add(pawn);
         }
 
@@ -132,20 +140,14 @@ public class Board : MonoBehaviour
 
     #region Gameplay
 
-    public void OnTileClick(Vector2 pPosition)
+    public void OnTileClick(Tile pTile, bool pIsReserve)
     {
-        Vector2 targetPos = WorldPositionToBoardPosition(pPosition);
-
-        if (!m_BoardInfo.TryGetValue(targetPos, out TileData pTileData)) return;
-
-        ProcessAction(pTileData, targetPos);
+        ProcessAction(pTile, pIsReserve);
     }
 
-    private void ProcessAction(TileData pTileData, Vector2 pTargetPos)
+    private void ProcessAction(Tile pTile, bool pIsReserve)
     {
-        Tile tile = pTileData.Tile;
-        Pawn pawn = pTileData.Pawn;
-
+        Pawn pawn = pTile.Pawn;
 
         if (m_BoardState == BoardState.Idle)
         {
@@ -153,15 +155,15 @@ public class Board : MonoBehaviour
         }
         else if (m_BoardState == BoardState.P1_PawnSelection && pawn != null && pawn.Team == Team.Player1)
         {
-            SelectPawn(pTileData, pTargetPos);
+            SelectPawn(pTile, pIsReserve);
         }
         else if (m_BoardState == BoardState.P2_PawnSelection && pawn != null && pawn.Team == Team.Player2)
         {
-            SelectPawn(pTileData, pTargetPos);
+            SelectPawn(pTile, pIsReserve);
         }
-        else if ((m_BoardState == BoardState.P1_PawnMove || m_BoardState == BoardState.P2_PawnMove) && m_ReachableTiles.Contains(tile))
+        else if ((m_BoardState == BoardState.P1_PawnMove || m_BoardState == BoardState.P2_PawnMove) && m_ReachableTiles.Contains(pTile))
         {
-            MovePawnTo(m_CurrentSelectedTileData.Pawn, pTargetPos);
+            MovePawnTo(m_CurrentSelectedTile.Pawn, pTile);
             CheckWin();
         }
         else if(m_BoardState == BoardState.P1_PawnMove || m_BoardState == BoardState.P2_PawnMove)
@@ -171,13 +173,14 @@ public class Board : MonoBehaviour
         }
     }
 
-    private void SelectPawn(TileData pTileData, Vector2 pTargetPos)
+    private void SelectPawn(Tile pTile, bool pIsReserve)
     {
-        m_CurrentSelectedTileData = pTileData;
+        m_CurrentSelectedTile = pTile;
 
-        m_CurrentSelectedTileData.Tile.SetState(TileState.Selected);
+        m_CurrentSelectedTile.SetState(TileState.Selected);
 
-        m_ReachableTiles.AddRange(GenerateReachableTileList(pTileData, pTargetPos));
+        m_ReachableTiles.AddRange(GenerateReachableTileList(pTile, pIsReserve));
+
         foreach (Tile reachableTile in m_ReachableTiles)
         {
             reachableTile.SetState(TileState.Highlighted);
@@ -186,52 +189,65 @@ public class Board : MonoBehaviour
         m_BoardState = m_BoardState == BoardState.P1_PawnSelection ? BoardState.P1_PawnMove : BoardState.P2_PawnMove;
     }
 
-    private List<Tile> GenerateReachableTileList(TileData pTileData, Vector2 pTargetPos)
+    private List<Tile> GenerateReachableTileList(Tile pTile, bool pIsReserve)
     {
         List<Tile> reachableTileList = new();
 
-        foreach (Vector2 range in pTileData.Pawn.PawnSo.Ranges)
+        if (pIsReserve)
         {
-            Vector2 newPos;
-
-            if (pTileData.Pawn.Team == Team.Player1)
+            foreach (KeyValuePair<Vector2, Tile> tile in m_BoardInfo)
             {
-                newPos = new Vector2(pTargetPos.x + range.x, pTargetPos.y + range.y);
-            }
-            else
-            {
-                newPos = new Vector2(pTargetPos.x + range.x, pTargetPos.y - range.y);
-            }
-
-            if (m_BoardInfo.TryGetValue(newPos, out TileData tileData) 
-                && (tileData.Pawn == null 
-                || tileData.Pawn.Team != pTileData.Pawn.Team))
-            {
-                reachableTileList.Add(tileData.Tile);
+                if (tile.Value.Pawn == null)
+                    reachableTileList.Add(tile.Value);
             }
         }
+        else
+        {
+            Vector2 targetPos = m_BoardInfo.FirstOrDefault(x => x.Value == pTile).Key;
+
+            foreach (Vector2 range in pTile.Pawn.PawnSo.Ranges)
+            {
+                Vector2 newPos;
+
+                if (pTile.Pawn.Team == Team.Player1)
+                {
+                    newPos = new Vector2(targetPos.x + range.x, targetPos.y + range.y);
+                }
+                else
+                {
+                    newPos = new Vector2(targetPos.x + range.x, targetPos.y - range.y);
+                }
+
+                if (m_BoardInfo.TryGetValue(newPos, out Tile tile)
+                    && (tile.Pawn == null
+                    || tile.Pawn.Team != pTile.Pawn.Team))
+                {
+                    reachableTileList.Add(tile);
+                }
+            }
+        }
+        
 
         return reachableTileList;
     }
 
-    private void MovePawnTo(Pawn pPawn, Vector2 pSelectedTarget)
+    private void MovePawnTo(Pawn pPawn, Tile pTargetTile)
     {
-        if (!m_BoardInfo.TryGetValue(pSelectedTarget, out TileData tileData)) return;
 
-        if (tileData.Pawn != null)
+        if (pTargetTile.Pawn != null)
         {
-            CapturePawn(tileData.Pawn);
+            CapturePawn(pTargetTile.Pawn);
         }
 
-        if(m_CurrentSelectedTileData != null)
+        if(m_CurrentSelectedTile != null)
         {
-            m_CurrentSelectedTileData.Pawn = null;
+            m_CurrentSelectedTile.Pawn = null;
         }
 
-        tileData.Pawn = pPawn;
-        pPawn.transform.SetParent(tileData.Tile.transform);
-        pPawn.transform.position = tileData.Tile.transform.position;
-        pPawn.transform.SetAsFirstSibling();
+        pTargetTile.Pawn = pPawn;
+
+        if (pTargetTile.TeamBackRow != Team.None && pTargetTile.TeamBackRow != pPawn.Team && !m_CurrentSelectedTile.IsReserve)
+            pPawn.Promote();
 
         ClearMoveState();
 
@@ -245,23 +261,22 @@ public class Board : MonoBehaviour
             case Team.Player1:
                 P1_OnBoardPawns.Remove(pPawn);
                 P2_InReservePawns.Add(pPawn);
-                pPawn.transform.SetParent(m_P2ReserveParent);
+                P2_InReserveTiles.First((x) => x.Pawn == null).Pawn = pPawn;
                 pPawn.Team = Team.Player2;
                 break;
             case Team.Player2:
                 P2_OnBoardPawns.Remove(pPawn);
                 P1_InReservePawns.Add(pPawn);
-                pPawn.transform.SetParent(m_P1ReserveParent);
+                P1_InReserveTiles.First((x) => x.Pawn == null).Pawn = pPawn;
                 pPawn.Team = Team.Player1;
                 break;
         }
     }
 
-
     private void ClearMoveState()
     {
-        m_CurrentSelectedTileData?.Tile?.SetState(TileState.None);
-        m_CurrentSelectedTileData = null;
+        m_CurrentSelectedTile?.SetState(TileState.None);
+        m_CurrentSelectedTile = null;
 
         foreach (var reachableTile in m_ReachableTiles)
         {
@@ -270,7 +285,6 @@ public class Board : MonoBehaviour
 
         m_ReachableTiles.Clear();
     }
-
 
     private void CheckWin()
     {
@@ -316,11 +330,6 @@ public class Board : MonoBehaviour
     }
 
     #endregion
-
-    [Button] private void Test()
-    {
-        MovePawnTo(P2_OnBoardPawns[0], Vector2.zero);
-    }
 }
 
 public enum BoardState
@@ -334,18 +343,11 @@ public enum BoardState
 
 public struct BoardData
 {
-    public Dictionary<Vector2, TileData> BoardState;
+    public Dictionary<Vector2, Tile> BoardState;
 
     public List<Pawn> P1_OnBoardPawns;
     public List<Pawn> P2_OnBoardPawns;
 
     public List<Pawn> P1_InReservePawns;
     public List<Pawn> P2_InReservePawns;
-}
-
-[System.Serializable]
-public class TileData
-{
-    public Tile Tile;
-    public Pawn Pawn;
 }

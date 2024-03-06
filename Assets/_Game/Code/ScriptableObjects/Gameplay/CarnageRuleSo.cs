@@ -6,7 +6,7 @@ using UnityEngine;
 public class CarnageRuleSo : VictoryRuleSo
 {
     public override Team CheckVictory(
-        Dictionary<Vector2, TileData> pBoardState, 
+        Dictionary<Vector2, Tile> pBoardState, 
         List<Pawn> pP1_OnBoardPawns, 
         List<Pawn> pP2_OnBoardPawns, 
         List<Pawn> pP1_InReservePawns, 

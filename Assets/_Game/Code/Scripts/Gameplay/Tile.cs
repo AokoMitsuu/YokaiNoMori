@@ -1,21 +1,37 @@
+using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class Tile : MonoBehaviour
+public class Tile : MonoBehaviour, IPointerDownHandler
 {
     [SerializeField] Image m_HoverImage;
     [SerializeField] Color m_BaseColor;
     [SerializeField] Color m_MoveableColor;
     [SerializeField] Color m_SelectedColor;
     [SerializeField] Color m_ReachableColor;
+    [SerializeField] private bool m_IsReserve = false;
 
     private Team m_TeamBackRow = Team.None;
+    private Pawn m_Pawn;
+    private Board m_Board;
 
     public Team TeamBackRow => m_TeamBackRow;
+    public Pawn Pawn 
+    { 
+        get => m_Pawn; 
+        set 
+        {
+            m_Pawn = value;
+            SetPawn();
+        }
+    }
+    public bool IsReserve => m_IsReserve;
 
-    public void Init(Team pTeamBackRow)
+    public void Init(Team pTeamBackRow, Board pBoard)
     {
         m_TeamBackRow = pTeamBackRow;
+        m_Board = pBoard;
         SetState(TileState.None);
     }
 
@@ -41,6 +57,20 @@ public class Tile : MonoBehaviour
     public void Clear()
     {
         SetState(TileState.None);
+    }
+
+    private void SetPawn()
+    {
+        if (m_Pawn == null) return;
+
+        m_Pawn.transform.SetParent(gameObject.transform);
+        m_Pawn.transform.position = transform.position;
+        m_Pawn.transform.SetAsFirstSibling();
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        m_Board.OnTileClick(this, m_IsReserve);
     }
 }
 

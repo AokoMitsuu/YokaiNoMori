@@ -25,6 +25,14 @@ public class Pawn : MonoBehaviour
         Team = team;
         m_Image.sprite = data.Sprite;
     }
+
+    public void Promote()
+    {
+        if (m_PawnSo.PromotedPawn == null) return;
+
+        Init(m_PawnSo.PromotedPawn, m_Team);
+
+    }
 }
 
 public enum Team

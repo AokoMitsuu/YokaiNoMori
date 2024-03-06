@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Ranges:
   - {x: 0, y: 1}
+  m_BackRowReachedEffect: 1
   m_Sprite: {fileID: 21300000, guid: cf37bafcee1662643a7326fd96199a85, type: 3}
-  m_PromotedPawn: {fileID: 0}
+  m_PromotedPawn: {fileID: 11400000, guid: 2031a5d52b7356141ba1dd2cc02ada73, type: 2}

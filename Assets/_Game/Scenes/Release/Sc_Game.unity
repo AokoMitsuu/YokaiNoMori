@@ -375,15 +375,21 @@ MonoBehaviour:
   - {fileID: 74519121}
   - {fileID: 363630039}
   - {fileID: 1069314478}
-  m_TurnLabel: {fileID: 1367171350}
+  m_TurnLabel: {fileID: 1367171351}
   m_TurnText: {fileID: 304065606}
   m_Scenario: {fileID: 11400000, guid: 6d4365b2c7a08d14eb8514168bd8c270, type: 2}
   m_VictoryRule: {fileID: 11400000, guid: ffbe451f58769ad4ba02d78c2a5f5900, type: 2}
   m_TileSize: 1.2
   m_TileSpacing: 0.1
   m_RotateDelay: 2
-  P1_Color: {r: 0, g: 0, b: 0, a: 0}
-  P2_Color: {r: 0, g: 0, b: 0, a: 0}
+  P1_Color: {r: 0, g: 0.69433475, b: 1, a: 1}
+  P2_Color: {r: 0.8584906, g: 0.068841234, b: 0.1218034, a: 1}
+  m_LabelCurve:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   m_SoundBeginTurn: {fileID: 11400000, guid: d74e89c5e1cd07041ac43afd8658d19f, type: 2}
   m_SoundEndTurn: {fileID: 11400000, guid: db2dc1b8eef3b4849962dd1e8ef846eb, type: 2}
   m_SoundCapture: {fileID: 11400000, guid: a8d2ffe5bf70e874b9a321562ac5f294, type: 2}
@@ -1063,8 +1069,8 @@ RectTransform:
   - {fileID: 304065608}
   m_Father: {fileID: 876743211}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.5}
-  m_AnchorMax: {x: 0, y: 0.5}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -1200, y: 0}
   m_SizeDelta: {x: 1100, y: 300}
   m_Pivot: {x: 0.5, y: 0.5}

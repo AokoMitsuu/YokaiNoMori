@@ -1,19 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.Rendering;
-using NaughtyAttributes;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices.WindowsRuntime;
 
 public class Board : MonoBehaviour
 {
     [Header("Items")]
-    [SerializeField] private Image m_BoardImage;
+    [SerializeField] private SpriteRenderer m_BoardSprite;
     [SerializeField] private Transform m_BoardParent;
-    [SerializeField] private Transform m_P1ReserveParent;
-    [SerializeField] private Transform m_P2ReserveParent;
     [SerializeField] private Tile m_TilePrefab;
     [SerializeField] private Pawn m_PawnPrefab;
     [SerializeField] private List<Sprite> m_BackgroundList = new();
@@ -86,7 +80,7 @@ public class Board : MonoBehaviour
     private void SetupAmbience()
     {
         int randomNumber = Random.Range(0, m_BackgroundList.Count);
-        m_BoardImage.sprite = m_BackgroundList[randomNumber];
+        m_BoardSprite.sprite = m_BackgroundList[randomNumber];
         App.Instance.AudioManager.StopAllMusics();
         m_BackgroundMusics[randomNumber]?.Play();
     }
@@ -345,7 +339,8 @@ public class Board : MonoBehaviour
         float centeredXOffset = xOffset - totalWidth / 2 + m_TileSize / 2;
         float centeredYOffset = yOffset - totalHeight / 2 + m_TileSize / 2;
 
-        return new Vector3(centeredXOffset + m_BoardImage.rectTransform.rect.width / 2.0f, centeredYOffset + m_BoardImage.rectTransform.rect.height / 2.0f, -1);
+        //return new Vector3(centeredXOffset + m_BoardImage.rectTransform.rect.width / 2.0f, centeredYOffset + m_BoardImage.rectTransform.rect.height / 2.0f, -1);
+        return new Vector3(centeredXOffset, centeredYOffset, -1);
     }
 
     private void AddActionHistory(List<string> pPlayerHistory, string action)

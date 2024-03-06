@@ -1,9 +1,8 @@
 using UnityEngine;
-using UnityEngine.UI;
 
 public class Pawn : MonoBehaviour
 {
-    [SerializeField] private Image m_Image;
+    [SerializeField] private SpriteRenderer m_Sprite;
 
     private PawnSo m_PawnSo;
     private Team m_Team;
@@ -23,7 +22,7 @@ public class Pawn : MonoBehaviour
     {
         m_PawnSo = data;
         Team = team;
-        m_Image.sprite = data.Sprite;
+        m_Sprite.sprite = data.Sprite;
     }
 
     public void Promote()

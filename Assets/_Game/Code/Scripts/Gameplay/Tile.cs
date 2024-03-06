@@ -1,11 +1,9 @@
-using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 public class Tile : MonoBehaviour, IPointerDownHandler
 {
-    [SerializeField] Image m_HoverImage;
+    [SerializeField] SpriteRenderer m_HoverImage;
     [SerializeField] Color m_BaseColor;
     [SerializeField] Color m_MoveableColor;
     [SerializeField] Color m_SelectedColor;

@@ -1,8 +1,11 @@
+using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Pawn : MonoBehaviour
 {
     [SerializeField] private SpriteRenderer m_Sprite;
+    [SerializeField] private Animator m_PromoteAnimator;
 
     private PawnSo m_PawnSo;
     private Team m_Team;
@@ -28,8 +31,7 @@ public class Pawn : MonoBehaviour
     public void Promote()
     {
         if (m_PawnSo.PromotedPawn == null) return;
-
-        Init(m_PawnSo.PromotedPawn, m_Team);
+        StartCoroutine(PromoteEffect());
     }
 
     public void Demote()
@@ -37,6 +39,15 @@ public class Pawn : MonoBehaviour
         if (m_PawnSo.DemotedPawn == null) return;
 
         Init(m_PawnSo.DemotedPawn, m_Team);
+    }
+
+    private IEnumerator PromoteEffect()
+    {
+        m_PromoteAnimator.gameObject.SetActive(true);
+        yield return new WaitForSeconds(m_PromoteAnimator.runtimeAnimatorController.animationClips[0].length);
+        Init(m_PawnSo.PromotedPawn, m_Team);
+        yield return new WaitForSeconds(2f);
+        m_PromoteAnimator.gameObject.SetActive(false);
     }
 }
 

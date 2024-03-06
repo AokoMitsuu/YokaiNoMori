@@ -47,6 +47,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Sprite: {fileID: 2738181191684074335}
+  m_PromoteAnimator: {fileID: 5262428094676313027}
 --- !u!1 &4552943190659695749
 GameObject:
   m_ObjectHideFlags: 0
@@ -140,6 +141,18 @@ PrefabInstance:
     m_TransformParent: {fileID: 1023186644041853404}
     m_Modifications:
     - target: {fileID: 1677334750579945604, guid: c02d9ef745b89564b82fa23b1939b5fb, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1677334750579945604, guid: c02d9ef745b89564b82fa23b1939b5fb, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1677334750579945604, guid: c02d9ef745b89564b82fa23b1939b5fb, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1677334750579945604, guid: c02d9ef745b89564b82fa23b1939b5fb, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -192,6 +205,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c02d9ef745b89564b82fa23b1939b5fb, type: 3}
+--- !u!95 &5262428094676313027 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 2734965392568897241, guid: c02d9ef745b89564b82fa23b1939b5fb, type: 3}
+  m_PrefabInstance: {fileID: 7850736157921504538}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8913887969262542238 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1677334750579945604, guid: c02d9ef745b89564b82fa23b1939b5fb, type: 3}

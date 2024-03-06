@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using System.Linq;
+using System.Collections;
+using DG.Tweening;
 
 public class Board : MonoBehaviour
 {
@@ -20,6 +22,7 @@ public class Board : MonoBehaviour
     [SerializeField] private VictoryRuleSo m_VictoryRule;
     [SerializeField] private float m_TileSize;
     [SerializeField] private float m_TileSpacing;
+    [SerializeField] private float m_RotateDelay;
 
     [Header("Dictionary")]
     [SerializeField] private SerializedDictionary<Vector2, Tile> m_BoardInfo = new();
@@ -37,6 +40,7 @@ public class Board : MonoBehaviour
     private BoardState m_BoardState;
     private Tile m_CurrentSelectedTile;
     private List<Tile> m_ReachableTiles = new();
+    private Tween m_Rotation;
 
     #region Setup
 
@@ -60,6 +64,11 @@ public class Board : MonoBehaviour
         {
             Destroy(pawn.gameObject);
         }
+
+        m_Rotation.Kill(false);
+        m_Rotation = null;
+
+        m_BoardParent.transform.rotation = Quaternion.identity;
 
         m_BoardInfo.Clear();
         P1_OnBoardPawns.Clear();
@@ -116,7 +125,7 @@ public class Board : MonoBehaviour
             var pawn = Instantiate(m_PawnPrefab);
             var pos = new Vector2(i % (int)m_Scenario.BoardSize.x, i / (int)m_Scenario.BoardSize.x);
             pawn.Init(m_Scenario.Pieces[i], Team.Player1);
-            MovePawnTo(pawn, m_BoardInfo[pos]);
+            MovePawnTo(pawn, m_BoardInfo[pos], true);
             P1_OnBoardPawns.Add(pawn);
 
             // PLAYER 2
@@ -124,7 +133,7 @@ public class Board : MonoBehaviour
             pawn = Instantiate(m_PawnPrefab);
             pos = new Vector2(reversedIndex % (int)m_Scenario.BoardSize.x, reversedIndex / (int)m_Scenario.BoardSize.x);
             pawn.Init(m_Scenario.Pieces[i], Team.Player2);
-            MovePawnTo(pawn, m_BoardInfo[pos]);
+            MovePawnTo(pawn, m_BoardInfo[pos], true);
             P2_OnBoardPawns.Add(pawn);
         }
 
@@ -226,12 +235,11 @@ public class Board : MonoBehaviour
                 }
             }
         }
-        
 
         return reachableTileList;
     }
 
-    private void MovePawnTo(Pawn pPawn, Tile pTargetTile)
+    private void MovePawnTo(Pawn pPawn, Tile pTargetTile, bool pIsSetup = false)
     {
 
         if (pTargetTile.Pawn != null)
@@ -246,19 +254,21 @@ public class Board : MonoBehaviour
 
         pTargetTile.Pawn = pPawn;
 
+        if (pIsSetup) return;
+
         if (pTargetTile.TeamBackRow != Team.None && pTargetTile.TeamBackRow != pPawn.Team && !m_CurrentSelectedTile.IsReserve)
             pPawn.Promote();
 
         ClearMoveState();
-
+        
         if (m_BoardState == BoardState.P1_PawnMove)
         {
-            m_BoardState = BoardState.P2_PawnSelection;
+            RotateBoard(m_BoardState = BoardState.P2_PawnSelection);
             AddActionHistory(P1_History ,$"{pPawn.PawnSo.name}-{pTargetTile.name}");
         }
         else
         {
-            m_BoardState = BoardState.P1_PawnSelection;
+            RotateBoard(m_BoardState = BoardState.P1_PawnSelection);
             AddActionHistory(P2_History, $"{pPawn.PawnSo.name}-{pTargetTile.name}");
         }
     }
@@ -327,6 +337,11 @@ public class Board : MonoBehaviour
         return player1ActionA && player1ActionB && player2ActionA && player2ActionB;
     }
 
+    private void RotateBoard(BoardState pNewState)
+    {
+        m_BoardState = BoardState.Idle;
+        m_Rotation = m_BoardParent.transform.DORotate(new Vector3(0, 0, 180f), m_RotateDelay, RotateMode.LocalAxisAdd).OnComplete(() => { m_BoardState = pNewState; });
+    }
     #endregion
 
     #region Utils
@@ -342,7 +357,6 @@ public class Board : MonoBehaviour
         float centeredXOffset = xOffset - totalWidth / 2 + m_TileSize / 2;
         float centeredYOffset = yOffset - totalHeight / 2 + m_TileSize / 2;
 
-        //return new Vector3(centeredXOffset + m_BoardImage.rectTransform.rect.width / 2.0f, centeredYOffset + m_BoardImage.rectTransform.rect.height / 2.0f, -1);
         return new Vector3(centeredXOffset, centeredYOffset, -1);
     }
 

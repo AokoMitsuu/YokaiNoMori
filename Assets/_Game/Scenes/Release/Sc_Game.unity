@@ -213,6 +213,11 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 5e78847fc970c9841a4f1770fcb99386, type: 3}
   - {fileID: 21300000, guid: 38f4df46776468543890f8202781643c, type: 3}
   - {fileID: 21300000, guid: fa09abaf3e46c704f94a9f4c3eadec78, type: 3}
+  m_BackgroundMusics:
+  - {fileID: 11400000, guid: 52c4f2f431e5106409d52e1df2896349, type: 2}
+  - {fileID: 11400000, guid: 52c4f2f431e5106409d52e1df2896349, type: 2}
+  - {fileID: 11400000, guid: 9d63cc38e6856924e9ea8b259752c93b, type: 2}
+  - {fileID: 11400000, guid: 9d63cc38e6856924e9ea8b259752c93b, type: 2}
   m_Scenario: {fileID: 11400000, guid: 6d4365b2c7a08d14eb8514168bd8c270, type: 2}
   m_VictoryRule: {fileID: 11400000, guid: 4615c62f9234ba543ab4b3d5f81ea594, type: 2}
   m_TileSize: 150

@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Promote
   m_EditorClassIdentifier: 
   m_AudioClip: {fileID: 8300000, guid: d3b0dadf214aaf4488d5c3c747a1b9c5, type: 3}
-  m_Volume: 0.75
+  m_Volume: 0.8
   m_Pitch: 1

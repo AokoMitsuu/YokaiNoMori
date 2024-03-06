@@ -9,9 +9,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ad2ba305c806858438d627904a6dec78, type: 3}
-  m_Name: ToReserve
+  m_Script: {fileID: 11500000, guid: 16989bdc42625a94994aadf819dbcff1, type: 3}
+  m_Name: SceneSwitcherSo
   m_EditorClassIdentifier: 
-  m_AudioClip: {fileID: 8300000, guid: df642658a22fec040b32b1ba302bfbe0, type: 3}
-  m_Volume: 0.5
-  m_Pitch: 1

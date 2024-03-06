@@ -245,7 +245,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_AppScene: __APP__
-  m_FirstScene: Sc_Game
+  m_FirstScene: Sc_Title
 --- !u!1 &6969256207176696884
 GameObject:
   m_ObjectHideFlags: 0

@@ -17,7 +17,7 @@ public class Pawn : MonoBehaviour
         set
         {
             m_Team = value;
-            transform.eulerAngles = value == Team.Player1 ? new Vector3(0f, 0f, 0f) : new Vector3(0f, 0f, 180f);
+            transform.localEulerAngles = value == Team.Player1 ? new Vector3(0f, 0f, 0f) : new Vector3(0f, 0f, 180f);
         }
     }
 

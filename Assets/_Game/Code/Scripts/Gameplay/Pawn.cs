@@ -30,7 +30,13 @@ public class Pawn : MonoBehaviour
         if (m_PawnSo.PromotedPawn == null) return;
 
         Init(m_PawnSo.PromotedPawn, m_Team);
+    }
 
+    public void Demote()
+    {
+        if (m_PawnSo.DemotedPawn == null) return;
+
+        Init(m_PawnSo.DemotedPawn, m_Team);
     }
 }
 

@@ -21,6 +21,7 @@ MonoBehaviour:
   - {x: -1, y: 1}
   - {x: 1, y: -1}
   - {x: -1, y: -1}
-  m_BackRowReachedEffect: 2
+  m_BackRowReachedEffect: 0
   m_Sprite: {fileID: 21300000, guid: db2fa296862e45046ba0893a534c9fcd, type: 3}
   m_PromotedPawn: {fileID: 0}
+  m_DemotedPawn: {fileID: 0}

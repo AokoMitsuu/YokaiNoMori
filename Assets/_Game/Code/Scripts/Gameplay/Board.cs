@@ -91,6 +91,7 @@ public class Board : MonoBehaviour
             for (int y = 0; y < m_Scenario.BoardSize.y; y++)
             {
                 Tile tile = Instantiate(m_TilePrefab, BoardPositionToWorldPosition(x, y), Quaternion.identity);
+                tile.transform.localScale = new Vector3(m_TileSize, m_TileSize, 1);
                 tile.name = $"{x}:{y}";
                 tile.transform.SetParent(m_BoardParent);
                 tile.Init(y == 0 ? Team.Player1 : y == m_Scenario.BoardSize.y - 1 ? Team.Player2 : Team.None, this);
@@ -270,12 +271,14 @@ public class Board : MonoBehaviour
                 P1_OnBoardPawns.Remove(pPawn);
                 P2_InReservePawns.Add(pPawn);
                 P2_InReserveTiles.First((x) => x.Pawn == null).Pawn = pPawn;
+                pPawn.Demote();
                 pPawn.Team = Team.Player2;
                 break;
             case Team.Player2:
                 P2_OnBoardPawns.Remove(pPawn);
                 P1_InReservePawns.Add(pPawn);
                 P1_InReserveTiles.First((x) => x.Pawn == null).Pawn = pPawn;
+                pPawn.Demote();
                 pPawn.Team = Team.Player1;
                 break;
         }

@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class Tile : MonoBehaviour, IPointerDownHandler
+public class Tile : MonoBehaviour
 {
     [SerializeField] SpriteRenderer m_HoverImage;
     [SerializeField] Color m_BaseColor;
@@ -66,7 +66,7 @@ public class Tile : MonoBehaviour, IPointerDownHandler
         m_Pawn.transform.SetAsFirstSibling();
     }
 
-    public void OnPointerDown(PointerEventData eventData)
+    public void OnMouseDown()
     {
         m_Board.OnTileClick(this, m_IsReserve);
     }

@@ -240,9 +240,9 @@ MonoBehaviour:
   - {fileID: 363630039}
   - {fileID: 1069314478}
   m_Scenario: {fileID: 11400000, guid: 6d4365b2c7a08d14eb8514168bd8c270, type: 2}
-  m_VictoryRule: {fileID: 11400000, guid: 4615c62f9234ba543ab4b3d5f81ea594, type: 2}
-  m_TileSize: 1
-  m_TileSpacing: 0.2
+  m_VictoryRule: {fileID: 11400000, guid: ffbe451f58769ad4ba02d78c2a5f5900, type: 2}
+  m_TileSize: 1.2
+  m_TileSpacing: 0.1
   m_BoardInfo:
     m_Keys: []
     m_Values: []
@@ -273,6 +273,22 @@ PrefabInstance:
     - target: {fileID: 6054054453391095082, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
       propertyPath: m_Name
       value: Tile (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 8706144843277454478, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
+      propertyPath: m_IsReserve
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8996716015059680500, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8996716015059680500, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8996716015059680500, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.2
       objectReference: {fileID: 0}
     - target: {fileID: 8996716015059680500, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
       propertyPath: m_LocalPosition.x
@@ -313,6 +329,10 @@ PrefabInstance:
     - target: {fileID: 8996716015059680500, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8996716015059680500, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -365,6 +385,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: Tile
       objectReference: {fileID: 0}
+    - target: {fileID: 8706144843277454478, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
+      propertyPath: m_IsReserve
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8996716015059680500, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8996716015059680500, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8996716015059680500, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.2
+      objectReference: {fileID: 0}
     - target: {fileID: 8996716015059680500, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
       propertyPath: m_LocalPosition.x
       value: -1.5
@@ -405,6 +441,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8996716015059680500, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -421,6 +461,22 @@ PrefabInstance:
     - target: {fileID: 6054054453391095082, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
       propertyPath: m_Name
       value: Tile (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 8706144843277454478, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
+      propertyPath: m_IsReserve
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8996716015059680500, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8996716015059680500, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8996716015059680500, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.2
       objectReference: {fileID: 0}
     - target: {fileID: 8996716015059680500, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
       propertyPath: m_LocalPosition.x
@@ -461,6 +517,10 @@ PrefabInstance:
     - target: {fileID: 8996716015059680500, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8996716015059680500, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -578,6 +638,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: Tile
       objectReference: {fileID: 0}
+    - target: {fileID: 8706144843277454478, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
+      propertyPath: m_IsReserve
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8996716015059680500, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8996716015059680500, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8996716015059680500, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.2
+      objectReference: {fileID: 0}
     - target: {fileID: 8996716015059680500, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
       propertyPath: m_LocalPosition.x
       value: -1.5
@@ -618,6 +694,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8996716015059680500, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -634,6 +714,22 @@ PrefabInstance:
     - target: {fileID: 6054054453391095082, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
       propertyPath: m_Name
       value: Tile (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 8706144843277454478, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
+      propertyPath: m_IsReserve
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8996716015059680500, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8996716015059680500, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8996716015059680500, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.2
       objectReference: {fileID: 0}
     - target: {fileID: 8996716015059680500, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
       propertyPath: m_LocalPosition.x
@@ -675,6 +771,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8996716015059680500, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -707,6 +807,22 @@ PrefabInstance:
     - target: {fileID: 6054054453391095082, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
       propertyPath: m_Name
       value: Tile (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 8706144843277454478, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
+      propertyPath: m_IsReserve
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8996716015059680500, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8996716015059680500, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8996716015059680500, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.2
       objectReference: {fileID: 0}
     - target: {fileID: 8996716015059680500, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
       propertyPath: m_LocalPosition.x
@@ -747,6 +863,10 @@ PrefabInstance:
     - target: {fileID: 8996716015059680500, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8996716015059680500, guid: 3f6b566710435f6459b51d6917253f17, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -97,6 +97,8 @@ public class Board : MonoBehaviour
         P2_OnBoardPawns.Clear();
         P1_InReservePawns.Clear();
         P2_InReservePawns.Clear();
+        P1_History.Clear();
+        P2_History.Clear();
     }
     private void SetupGame()
     {
@@ -281,6 +283,15 @@ public class Board : MonoBehaviour
 
         pTargetTile.Pawn = pPawn;
 
+        if (m_BoardState == BoardState.P1_PawnMove)
+        {
+            AddActionHistory(P1_History, $"{pPawn.PawnSo.name}-{pTargetTile.name}");
+        }
+        else
+        {
+            AddActionHistory(P2_History, $"{pPawn.PawnSo.name}-{pTargetTile.name}");
+        }
+
         bool isWin = CheckWin(pIsSetup);
 
         if (pIsSetup) return;
@@ -302,12 +313,10 @@ public class Board : MonoBehaviour
             if (m_BoardState == BoardState.P1_PawnMove)
             {
                 RotateBoard(m_BoardState = BoardState.P2_PawnSelection);
-                AddActionHistory(P1_History, $"{pPawn.PawnSo.name}-{pTargetTile.name}");
             }
             else
             {
                 RotateBoard(m_BoardState = BoardState.P1_PawnSelection);
-                AddActionHistory(P2_History, $"{pPawn.PawnSo.name}-{pTargetTile.name}");
             }
         }
     }

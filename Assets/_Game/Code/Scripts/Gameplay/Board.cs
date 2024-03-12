@@ -19,7 +19,6 @@ public class Board : MonoBehaviour
     [SerializeField] private Tile m_TilePrefab;
     [SerializeField] private Pawn m_PawnPrefab;
     [SerializeField] private List<Sprite> m_BackgroundList = new();
-    [SerializeField] private List<MusicSo> m_BackgroundMusics = new();
     [SerializeField] private List<Tile> P1_InReserveTiles;
     [SerializeField] private List<Tile> P2_InReserveTiles;
     [SerializeField] private Image m_TurnLabel;
@@ -118,8 +117,6 @@ public class Board : MonoBehaviour
     {
         int randomNumber = Random.Range(0, m_BackgroundList.Count);
         m_BoardSprite.sprite = m_BackgroundList[randomNumber];
-        App.Instance.AudioManager.StopAllMusics();
-        m_BackgroundMusics[randomNumber]?.Play();
     }
     private void SetupTiles()
     {

@@ -361,11 +361,6 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 5e78847fc970c9841a4f1770fcb99386, type: 3}
   - {fileID: 21300000, guid: 38f4df46776468543890f8202781643c, type: 3}
   - {fileID: 21300000, guid: fa09abaf3e46c704f94a9f4c3eadec78, type: 3}
-  m_BackgroundMusics:
-  - {fileID: 11400000, guid: 52c4f2f431e5106409d52e1df2896349, type: 2}
-  - {fileID: 11400000, guid: 52c4f2f431e5106409d52e1df2896349, type: 2}
-  - {fileID: 11400000, guid: 9d63cc38e6856924e9ea8b259752c93b, type: 2}
-  - {fileID: 11400000, guid: 9d63cc38e6856924e9ea8b259752c93b, type: 2}
   P1_InReserveTiles:
   - {fileID: 876177444}
   - {fileID: 1607232954}
@@ -1600,6 +1595,52 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c31bce82949e9874182d01972b098992, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1669656041
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1669656043}
+  - component: {fileID: 1669656042}
+  m_Layer: 0
+  m_Name: InitMusic
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1669656042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1669656041}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3454a7b39c258347b8d06c4d6e2d05d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_MusicsToPlay:
+  - {fileID: 11400000, guid: 52c4f2f431e5106409d52e1df2896349, type: 2}
+--- !u!4 &1669656043
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1669656041}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1830865532
 GameObject:
   m_ObjectHideFlags: 0
@@ -1908,3 +1949,4 @@ SceneRoots:
   - {fileID: 328843346}
   - {fileID: 658985089}
   - {fileID: 876743211}
+  - {fileID: 1669656043}

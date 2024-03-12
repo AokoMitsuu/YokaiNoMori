@@ -7,6 +7,8 @@ using NaughtyAttributes;
 using TMPro;
 using UnityEngine.UI;
 using System.Data;
+using System.Collections;
+using Unity.VisualScripting;
 
 public class Board : MonoBehaviour
 {
@@ -31,7 +33,8 @@ public class Board : MonoBehaviour
     [SerializeField] private float m_RotateDelay;
     [SerializeField] private Color P1_Color;
     [SerializeField] private Color P2_Color;
-    [SerializeField] private AnimationCurve m_LabelCurve;
+    [SerializeField] private Color Draw_Color;
+    [SerializeField] private float m_VictoryScreenDelay;
 
     [SerializeField, Foldout("Sound")] private SoundSo m_SoundBeginTurn;
     [SerializeField, Foldout("Sound")] private SoundSo m_SoundEndTurn;
@@ -58,8 +61,9 @@ public class Board : MonoBehaviour
     private Tile m_CurrentSelectedTile;
     private List<Tile> m_ReachableTiles = new();
     private Tween m_Rotation;
-    private Sequence m_LabelMove;
+    private Tween m_Translation;
     private bool m_IsReserve;
+    private Coroutine m_TurnCoroutine;
 
     #region Setup
 
@@ -85,7 +89,6 @@ public class Board : MonoBehaviour
         }
 
         m_Rotation.Kill(false);
-        m_LabelMove.Kill(false);
         m_Rotation = null;
 
         m_BoardParent.transform.rotation = Quaternion.identity;
@@ -105,6 +108,11 @@ public class Board : MonoBehaviour
         SetupAmbience();
         SetupTiles();
         SetupPawns();
+
+        if(m_TurnCoroutine != null)
+            StopCoroutine(m_TurnCoroutine);
+
+        m_TurnCoroutine = StartCoroutine(ShowLabel(P1_Color, "Au tour du joueur 1"));
     }
     private void SetupAmbience()
     {
@@ -194,7 +202,6 @@ public class Board : MonoBehaviour
         else if ((m_BoardState == BoardState.P1_PawnMove || m_BoardState == BoardState.P2_PawnMove) && m_ReachableTiles.Contains(pTile))
         {
             MovePawnTo(m_CurrentSelectedTile.Pawn, pTile);
-            CheckWin();
         }
         else if(m_BoardState == BoardState.P1_PawnMove || m_BoardState == BoardState.P2_PawnMove)
         {
@@ -277,9 +284,11 @@ public class Board : MonoBehaviour
 
         pTargetTile.Pawn = pPawn;
 
+        bool isWin = CheckWin(pIsSetup);
+
         if (pIsSetup) return;
 
-        if (pTargetTile.TeamBackRow != Team.None && pTargetTile.TeamBackRow != pPawn.Team && !m_CurrentSelectedTile.IsReserve)
+        if (pTargetTile.TeamBackRow != Team.None && pTargetTile.TeamBackRow != pPawn.Team && !m_CurrentSelectedTile.IsReserve && !isWin)
             pPawn.Promote();
 
         if(m_IsReserve)
@@ -290,16 +299,19 @@ public class Board : MonoBehaviour
         m_SoundEndTurn.Play();
 
         ClearMoveState();
-        
-        if (m_BoardState == BoardState.P1_PawnMove)
+
+        if (!isWin)
         {
-            RotateBoard(m_BoardState = BoardState.P2_PawnSelection);
-            AddActionHistory(P1_History ,$"{pPawn.PawnSo.name}-{pTargetTile.name}");
-        }
-        else
-        {
-            RotateBoard(m_BoardState = BoardState.P1_PawnSelection);
-            AddActionHistory(P2_History, $"{pPawn.PawnSo.name}-{pTargetTile.name}");
+            if (m_BoardState == BoardState.P1_PawnMove)
+            {
+                RotateBoard(m_BoardState = BoardState.P2_PawnSelection);
+                AddActionHistory(P1_History, $"{pPawn.PawnSo.name}-{pTargetTile.name}");
+            }
+            else
+            {
+                RotateBoard(m_BoardState = BoardState.P1_PawnSelection);
+                AddActionHistory(P2_History, $"{pPawn.PawnSo.name}-{pTargetTile.name}");
+            }
         }
     }
 
@@ -339,22 +351,24 @@ public class Board : MonoBehaviour
         m_ReachableTiles.Clear();
     }
 
-    private void CheckWin()
+    private bool CheckWin(bool pIsSetup)
     {
+        if (pIsSetup) return false;
+
         if(CheckDraw()) // DRAW
         {
             Debug.Log("DRAW");
-            SetupGame();
+            StartCoroutine(EndScreen(Team.None));
+            return true;
         }
         else
         {
             Team winner = m_VictoryRule.CheckVictory(m_BoardInfo, P1_OnBoardPawns, P2_OnBoardPawns, P1_InReservePawns, P2_InReservePawns);
-            if (winner == Team.None) return;
+            if (winner == Team.None) return false;
 
-            Debug.Log(winner);
-            SetupGame();
+            StartCoroutine(EndScreen(winner));
+            return true;
         }
-
     }
     private bool CheckDraw()
     {
@@ -373,27 +387,61 @@ public class Board : MonoBehaviour
     {
         m_BoardState = BoardState.Idle;
 
+        if (m_TurnCoroutine != null)
+            StopCoroutine(m_TurnCoroutine);
+
         if (pNewState == BoardState.P1_PawnSelection)
         {
-            m_TurnText.text = "Au tour du joueur 1";
-            m_TurnLabel.color = P1_Color;
+            m_TurnCoroutine = StartCoroutine(ShowLabel(P1_Color, "Au tour du joueur 1"));
         }
         else
         {
-            m_TurnText.text = "Au tour du joueur 2";
-            m_TurnLabel.color = P2_Color;
+            m_TurnCoroutine = StartCoroutine(ShowLabel(P2_Color, "Au tour du joueur 2"));
         }
 
         m_Rotation = m_ToRotate.transform.DORotate(new Vector3(0, 0, 180f), m_RotateDelay, RotateMode.LocalAxisAdd).SetEase(Ease.InOutBack).OnComplete(() => { m_BoardState = pNewState; m_SoundBeginTurn.Play(); });
+    }
+    private IEnumerator EndScreen(Team pWiner)
+    {
+        m_BoardState = BoardState.Idle;
+        
+        if (m_TurnCoroutine != null)
+            StopCoroutine(m_TurnCoroutine);
 
-        m_LabelMove.Kill(true);
+        if (pWiner == Team.Player1)
+        {
+            yield return ShowLabel(P1_Color, "Joueur 1 a gagné", m_VictoryScreenDelay);
+        }
+        else if (pWiner == Team.Player2)
+        {
+            yield return ShowLabel(P2_Color, "Joueur 2 a gagné", m_VictoryScreenDelay);
+        }
+        else
+        {
+            yield return ShowLabel(Draw_Color, "Egalité", m_VictoryScreenDelay);
+        }
+
+        SetupGame();
+    }
+
+    private IEnumerator ShowLabel(Color pColor, string pText, float pDelay = 0)
+    {
+        m_TurnText.text = pText;
+        m_TurnLabel.color = pColor;
+
+        m_Translation.Kill(true);
 
         m_TurnLabel.rectTransform.position = new Vector3(-Screen.width, m_TurnLabel.rectTransform.position.y, m_TurnLabel.rectTransform.position.z);
 
-        m_LabelMove = DOTween.Sequence();
-        m_LabelMove.Append(m_TurnLabel.rectTransform.DOAnchorPosX(0, m_RotateDelay).SetEase(Ease.OutExpo));
-        m_LabelMove.AppendInterval(0);
-        m_LabelMove.Append(m_TurnLabel.rectTransform.DOAnchorPosX(Screen.width, m_RotateDelay).SetEase(Ease.OutExpo));
+        m_Translation = m_TurnLabel.rectTransform.DOAnchorPosX(0, m_RotateDelay).SetEase(Ease.OutExpo);
+
+        yield return m_Translation.WaitForCompletion();
+
+        yield return new WaitForSeconds(pDelay);
+
+        m_Translation = m_TurnLabel.rectTransform.DOAnchorPosX(Screen.width, m_RotateDelay).SetEase(Ease.OutExpo);
+
+        yield return m_Translation.WaitForCompletion();
     }
     #endregion
 

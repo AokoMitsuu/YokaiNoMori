@@ -1,7 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
+using YokaiNoMori.Enumeration;
 
 public abstract class VictoryRuleSo : ScriptableObject
 {
-    public abstract Team CheckVictory(Dictionary<Vector2, Tile> pBoardState, List<Pawn> pP1_OnBoardPawns, List<Pawn> pP2_OnBoardPawns, List<Pawn> pP1_InReservePawns, List<Pawn> pP2_InReservePawns);
+    public abstract ECampType CheckVictory(
+        List<TileData> pTileList, 
+        List<PawnData> pP1_OnBoardPawns, 
+        List<PawnData> pP2_OnBoardPawns
+        );
 }

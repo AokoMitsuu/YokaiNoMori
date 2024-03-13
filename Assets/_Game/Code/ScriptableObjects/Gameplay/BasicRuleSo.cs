@@ -1,57 +1,52 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
+using YokaiNoMori.Enumeration;
 
 [CreateAssetMenu(menuName = "Rules/Basic", fileName = "Basic")]
 public class BasicRuleSo : VictoryRuleSo
 {
     [SerializeField] private PawnSo m_King;
 
-    public override Team CheckVictory(
-        Dictionary<Vector2, Tile> pBoardState,
-        List<Pawn> pP1_OnBoardPawns,
-        List<Pawn> pP2_OnBoardPawns,
-        List<Pawn> pP1_InReservePawns,
-        List<Pawn> pP2_InReservePawns
+    public override ECampType CheckVictory(
+        List<TileData> pTileList,
+        List<PawnData> pP1_OnBoardPawns,
+        List<PawnData> pP2_OnBoardPawns
     )
     {
-        Team winner = Team.None;
+        ECampType winner = ECampType.NONE;
 
-        if (!CheckKingAlive(pP1_OnBoardPawns) || CheckKingInBackrowAndCannotTakeBack(pBoardState, pP2_OnBoardPawns.Find((pawn) => pawn.PawnSo == m_King), pP1_OnBoardPawns, Team.Player1))
-            winner = Team.Player2;
-        else if(!CheckKingAlive(pP2_OnBoardPawns) || CheckKingInBackrowAndCannotTakeBack(pBoardState, pP1_OnBoardPawns.Find((pawn) => pawn.PawnSo == m_King), pP1_OnBoardPawns, Team.Player2))
-            winner = Team.Player1;
+        if (!CheckKingAlive(pP1_OnBoardPawns) || CheckKingInBackrowAndCannotTakeBack(pTileList, pP2_OnBoardPawns.Find((pawn) => pawn.PawnSo == m_King), pP1_OnBoardPawns, ECampType.PLAYER_ONE))
+            winner = ECampType.PLAYER_TWO;
+        else if(!CheckKingAlive(pP2_OnBoardPawns) || CheckKingInBackrowAndCannotTakeBack(pTileList, pP1_OnBoardPawns.Find((pawn) => pawn.PawnSo == m_King), pP1_OnBoardPawns, ECampType.PLAYER_TWO))
+            winner = ECampType.PLAYER_ONE;
 
         return winner;
     }
 
-    private bool CheckKingAlive(List<Pawn> playerPawn)
+    private bool CheckKingAlive(List<PawnData> playerPawn)
     {
         return playerPawn.Any((pawn) => pawn.PawnSo == m_King);
     }
 
-    private bool CheckKingInBackrowAndCannotTakeBack(Dictionary<Vector2, Tile> pBoardState, Pawn pKing, List<Pawn> pAdversePawn, Team pTeamBackRow)
+    private bool CheckKingInBackrowAndCannotTakeBack(List<TileData> pTileList, PawnData pKing, List<PawnData> pAdversePawn, ECampType pTeamBackRow)
     {
-        Tile targetPos = pBoardState.FirstOrDefault(x => x.Value.Pawn == pKing).Value;
-
-        return !GenerateReachableTileList(pBoardState, pAdversePawn).Contains(targetPos) && pTeamBackRow == targetPos.TeamBackRow;
+        return pTeamBackRow == pKing.CurrentTile.TeamBackRow && !GenerateReachableTileList(pTileList, pAdversePawn).Contains(pKing.CurrentTile);
     }
 
-    private List<Tile> GenerateReachableTileList(Dictionary<Vector2, Tile> pBoardState, List<Pawn> pAdversePawn)
+    private List<TileData> GenerateReachableTileList(List<TileData> pTileList, List<PawnData> pAdversePawn)
     {
-        List<Tile> reachableTileList = new();
+        List<TileData> reachableTileList = new();
 
-        foreach(Pawn pawn in pAdversePawn)
+        foreach(PawnData pawn in pAdversePawn)
         {
-            Vector2 targetPos = pBoardState.FirstOrDefault(x => x.Value.Pawn == pawn).Key;
+            Vector2 targetPos = pawn.CurrentTile.GetPosition();
 
             foreach (Vector2 range in pawn.PawnSo.Ranges)
             {
                 Vector2 newPos;
 
-                if (pawn.Team == Team.Player1)
+                if (pawn.Team == ECampType.PLAYER_ONE)
                 {
                     newPos = new Vector2(targetPos.x + range.x, targetPos.y + range.y);
                 }
@@ -60,11 +55,11 @@ public class BasicRuleSo : VictoryRuleSo
                     newPos = new Vector2(targetPos.x + range.x, targetPos.y - range.y);
                 }
 
-                if (pBoardState.TryGetValue(newPos, out Tile tile)
-                    && (tile.Pawn == null
-                    || tile.Pawn.Team != pawn.Team))
+                TileData tileData = pTileList.Find(x => x.GetPosition().Equals(newPos));
+
+                if (tileData != null && (tileData.GetPawnOnIt() == null || tileData.PawnData.Team != pawn.Team))
                 {
-                    reachableTileList.Add(tile);
+                    reachableTileList.Add(tileData);
                 }
             }
         }

@@ -5,8 +5,8 @@ using UnityEngine;
 public class ScenarioSo : ScriptableObject
 {
     [SerializeField] private Vector2 m_BoardSize;
-    [SerializeField] private List<PawnSo> m_Pieces;
+    [SerializeField] private List<PawnSo> m_Pawns;
 
     public Vector2 BoardSize => m_BoardSize;
-    public List<PawnSo> Pieces => m_Pieces;
+    public List<PawnSo> Pawns => m_Pawns;
 }

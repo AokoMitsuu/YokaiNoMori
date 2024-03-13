@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1023186644041853404}
-  - component: {fileID: 6038232051847298016}
+  - component: {fileID: 6398669631294499030}
   m_Layer: 0
   m_Name: Pawn
   m_TagString: Untagged
@@ -34,7 +34,7 @@ Transform:
   - {fileID: 8913887969262542238}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6038232051847298016
+--- !u!114 &6398669631294499030
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -43,7 +43,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4251468302988214113}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7311bc8191f580a469671367c75d42a9, type: 3}
+  m_Script: {fileID: 11500000, guid: 0df6da6812536cf49b5503b7d9f2d1f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Sprite: {fileID: 2738181191684074335}

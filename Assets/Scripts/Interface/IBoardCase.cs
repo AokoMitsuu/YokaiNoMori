@@ -11,6 +11,7 @@ namespace YokaiNoMori.Interface
         /// <returns></returns>
         public Vector2Int GetPosition();
 
+
         /// <summary>
         /// Retrieves the pawn on this case
         /// </summary>

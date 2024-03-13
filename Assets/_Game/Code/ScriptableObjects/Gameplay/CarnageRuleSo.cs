@@ -1,23 +1,21 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using YokaiNoMori.Enumeration;
 
 [CreateAssetMenu(menuName = "Rules/Carnage", fileName = "Carnage")]
 public class CarnageRuleSo : VictoryRuleSo
 {
-    public override Team CheckVictory(
-        Dictionary<Vector2, Tile> pBoardState, 
-        List<Pawn> pP1_OnBoardPawns, 
-        List<Pawn> pP2_OnBoardPawns, 
-        List<Pawn> pP1_InReservePawns, 
-        List<Pawn> pP2_InReservePawns
+    public override ECampType CheckVictory(
+        List<TileData> pTileList, 
+        List<PawnData> pP1_OnBoardPawns, 
+        List<PawnData> pP2_OnBoardPawns
     )
     {
         if (pP1_OnBoardPawns.Count == 0)
-            return Team.Player2;
+            return ECampType.PLAYER_TWO;
         else if (pP2_OnBoardPawns.Count == 0)
-            return Team.Player1;
+            return ECampType.PLAYER_ONE;
         else
-            return Team.None;
+            return ECampType.NONE;
     }
 }

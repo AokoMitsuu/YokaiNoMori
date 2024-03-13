@@ -1,5 +1,7 @@
 namespace YokaiNoMori.Enumeration
 {
+
+
     [System.Flags]
     public enum EMovementType
     {

@@ -1,5 +1,6 @@
 namespace YokaiNoMori.Enumeration
 {
+
     public enum EPawnType
     {
         Kodama,

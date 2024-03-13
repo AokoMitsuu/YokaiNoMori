@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Base
   m_EditorClassIdentifier: 
   m_BoardSize: {x: 3, y: 4}
-  m_Pieces:
+  m_Pawns:
   - {fileID: 11400000, guid: e73331cdcff6d7645bd2a19c0c2feb4f, type: 2}
   - {fileID: 11400000, guid: 2963aee4d9d1fd94ba85ef7752228256, type: 2}
   - {fileID: 11400000, guid: f35bfbfbb6ce8014e9a54e6e328091ad, type: 2}

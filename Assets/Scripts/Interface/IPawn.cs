@@ -24,10 +24,13 @@ namespace YokaiNoMori.Interface
         /// <returns>null is no case</returns>
         public IBoardCase GetCurrentBoardCase();
 
+
         /// <summary>
         /// Retrieve pawn type
         /// </summary>
         /// <returns></returns>
         public EPawnType GetPawnType();
+
     }
+
 }

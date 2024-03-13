@@ -5,6 +5,12 @@ namespace YokaiNoMori.Interface
     public interface ICompetitor
     {
         /// <summary>
+        /// Called by the GameManager for init competitor and get the GameManager (for IA)
+        /// </summary>
+        /// <param name="igameManager"></param>
+        public void Init(IGameManager igameManager);
+
+        /// <summary>
         /// Used by my UI
         /// </summary>
         /// <returns>Returns the name of this competitor's creator group</returns>

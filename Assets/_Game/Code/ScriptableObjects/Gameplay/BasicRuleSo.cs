@@ -40,19 +40,19 @@ public class BasicRuleSo : VictoryRuleSo
 
         foreach(PawnData pawn in pAdversePawn)
         {
-            Vector2 targetPos = pawn.CurrentTile.GetPosition();
+            Vector2Int targetPos = pawn.CurrentTile.GetPosition();
 
-            foreach (Vector2 range in pawn.PawnSo.Ranges)
+            foreach (Vector2Int range in pawn.PawnSo.Ranges)
             {
-                Vector2 newPos;
+                Vector2Int newPos;
 
                 if (pawn.Team == ECampType.PLAYER_ONE)
                 {
-                    newPos = new Vector2(targetPos.x + range.x, targetPos.y + range.y);
+                    newPos = new Vector2Int(targetPos.x + range.x, targetPos.y + range.y);
                 }
                 else
                 {
-                    newPos = new Vector2(targetPos.x + range.x, targetPos.y - range.y);
+                    newPos = new Vector2Int(targetPos.x + range.x, targetPos.y - range.y);
                 }
 
                 TileData tileData = pTileList.Find(x => x.GetPosition().Equals(newPos));

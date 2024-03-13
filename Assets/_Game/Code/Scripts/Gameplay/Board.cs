@@ -186,6 +186,7 @@ public class Board : MonoBehaviour, IGameManager
             Vector2Int pos = new Vector2Int(i % (int)m_Scenario.BoardSize.x, i / (int)m_Scenario.BoardSize.x);
             PawnData pawnData = new();
             pawnDisplay.SetPawnData(pawnData);
+            pawnDisplay.name = m_Scenario.Pawns[i].name + "1";
             pawnData.Init(m_Scenario.Pawns[i], ECampType.PLAYER_ONE);
             MovePawnTo(pawnData, pawnDisplay.transform, m_TileList.Where(x => x.GetPosition() == pos).ToList().First(), true);
             P1_PawnList.Add(pawnData);
@@ -199,6 +200,7 @@ public class Board : MonoBehaviour, IGameManager
             pos = new Vector2Int(reversedIndex % (int)m_Scenario.BoardSize.x, reversedIndex / (int)m_Scenario.BoardSize.x);
             pawnData = new();
             pawnDisplay.SetPawnData(pawnData);
+            pawnDisplay.name = m_Scenario.Pawns[i].name + "2";
             pawnData.Init(m_Scenario.Pawns[i], ECampType.PLAYER_TWO);
             MovePawnTo(pawnData, pawnDisplay.transform, m_TileList.Where(x => x.GetPosition() == pos).ToList().First(), true);
             P2_PawnList.Add(pawnData);
@@ -261,7 +263,7 @@ public class Board : MonoBehaviour, IGameManager
     private void MovePawnTo(PawnData pPawn, Transform pPawnTransform, TileData pTargetTile, bool pIsSetup = false)
     {
         //Capture
-        if (pTargetTile.PawnData != null) { CapturePawn(pTargetTile.PawnData, pPawnTransform, pTargetTile); }
+        if (pTargetTile.PawnData != null) { CapturePawn(pTargetTile.PawnData, pTargetTile); }
 
         //Movement
         if (m_SelectedTileDisplay != null) { m_SelectedTileDisplay.TileData.SetPawn(null, null); }
@@ -306,21 +308,22 @@ public class Board : MonoBehaviour, IGameManager
             }
         }
     }
-    private void CapturePawn(PawnData pPawn, Transform pPawnTransform, TileData pTileData)
+    private void CapturePawn(PawnData pPawn,  TileData pTileData)
     {
         pTileData.SetPawn(null, null);
+        Transform pawnTransform = m_SpawnedPawnDisplays.Find(x => x.PawnData == pPawn).transform;
 
         switch (pPawn.Team)
         {
             case ECampType.PLAYER_ONE:
                 P1_PawnList.Remove(pPawn);
-                P2_ReserveList.Find(x => x.PawnData == null).SetPawn(pPawn, pPawnTransform);
+                P2_ReserveList.Find(x => x.PawnData == null).SetPawn(pPawn, pawnTransform);
                 pPawn.Team = ECampType.PLAYER_TWO;
                 break;
 
             case ECampType.PLAYER_TWO:
                 P2_PawnList.Remove(pPawn);
-                P1_ReserveList.Find(x => x.PawnData == null).SetPawn(pPawn, pPawnTransform);
+                P1_ReserveList.Find(x => x.PawnData == null).SetPawn(pPawn, pawnTransform);
                 pPawn.Team = ECampType.PLAYER_ONE;
                 break;
         }
@@ -465,7 +468,7 @@ public class Board : MonoBehaviour, IGameManager
         {
             foreach (TileDisplay tileDisplay in m_SpawnedTileDisplays)
             {
-                if (tileDisplay.TileData.PawnData == null)
+                if (tileDisplay.TileData.PawnData == null && !tileDisplay.TileData.IsReserve)
                 {
                     reachableTileList.Add(tileDisplay);
                 }

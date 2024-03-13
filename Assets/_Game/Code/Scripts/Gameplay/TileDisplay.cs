@@ -52,8 +52,8 @@ public class TileDisplay : MonoBehaviour
     }
     private void UpdateDisplay(Transform pPawnTransform)
     {
-        pPawnTransform.position = this.transform.position;
         pPawnTransform.SetParent(this.transform);
         pPawnTransform.SetAsFirstSibling();
+        pPawnTransform.position = this.transform.position;
     }
 }

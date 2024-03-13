@@ -33,9 +33,10 @@ public class TileData : IBoardCase
     }
     public void SetPawn(PawnData pPawnData, Transform pPawnTranform)
     {
+        m_PawnData = pPawnData;
+
         if (pPawnData == null) return;
 
-        m_PawnData = pPawnData;
         pPawnData.CurrentTile = this;
         OnPawnUpdated?.Invoke(pPawnTranform);
     }

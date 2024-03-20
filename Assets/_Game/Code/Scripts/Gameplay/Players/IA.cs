@@ -7,6 +7,7 @@ public class IA : MonoBehaviour, ICompetitor
     private string m_Name = "groupe 5-GRASSE-CORNET";
     private IGameManager m_Board;
     private ECampType m_ECampType;
+    private float m_MaxThinkingTimer;
 
     public string GetName()
     {
@@ -20,9 +21,10 @@ public class IA : MonoBehaviour, ICompetitor
     {
         m_ECampType = pCamp;
     }
-    public void Init(IGameManager pIGameManager)
+    public void Init(IGameManager pIGameManager, float timerForAI)
     {
         m_Board = pIGameManager;
+        m_MaxThinkingTimer = timerForAI;
     }
     public void StartTurn()
     {

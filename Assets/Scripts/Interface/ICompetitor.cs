@@ -6,10 +6,10 @@ namespace YokaiNoMori.Interface
     public interface ICompetitor
     {
         /// <summary>
-        /// Called by the GameManager for init competitor and get the GameManager (for IA)
+        /// Called by the GameManager for init competitor and get the GameManager (for AI)
         /// </summary>
         /// <param name="igameManager"></param>
-        public void Init(IGameManager igameManager);
+        public void Init(IGameManager igameManager, float timerForAI);
 
 
         /// <summary>

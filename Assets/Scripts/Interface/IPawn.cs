@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using YokaiNoMori.Enumeration;
 
 
 namespace YokaiNoMori.Interface
@@ -30,6 +31,11 @@ namespace YokaiNoMori.Interface
         /// <returns>Vector2Int equals the position in the array. Example : [0,0] for the bot left side</returns>
         public Vector2Int GetCurrentPosition();
 
+        /// <summary>
+        /// Retrieve the pawn type
+        /// </summary>
+        /// <returns>EPawnType</returns>
+        public EPawnType GetPawnType();
     }
 
 }

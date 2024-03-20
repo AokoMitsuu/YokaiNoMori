@@ -8,9 +8,12 @@ using System.Collections;
 using TMPro;
 using UnityEngine.UI;
 using System.Linq;
+using Unity.VisualScripting;
 
 public class Board : MonoBehaviour, IGameManager
 {
+    [SerializeField] private TreeGen tree;
+
     [Header("Settings")]
     [SerializeField] private ScenarioSo m_Scenario;
     [SerializeField] private VictoryRuleSo m_VictoryRule;
@@ -94,6 +97,8 @@ public class Board : MonoBehaviour, IGameManager
         m_TurnCoroutine = StartCoroutine(ShowLabel(P1_Color, "Au tour du joueur 1"));
 
         m_BoardState = BoardState.P1_PawnSelection;
+
+        tree.GenerateTree(m_TileList, P1_ReserveList, P2_ReserveList);
     }
     private void Clear()
     {

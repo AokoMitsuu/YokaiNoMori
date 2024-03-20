@@ -31,6 +31,9 @@ public class BasicRuleSo : VictoryRuleSo
 
     private bool CheckKingInBackrowAndCannotTakeBack(List<TileData> pTileList, PawnData pKing, List<PawnData> pAdversePawn, ECampType pTeamBackRow)
     {
+        if (pKing == null)
+            return false;
+
         return pTeamBackRow == pKing.CurrentTile.TeamBackRow && !GenerateReachableTileList(pTileList, pAdversePawn).Contains(pKing.CurrentTile);
     }
 

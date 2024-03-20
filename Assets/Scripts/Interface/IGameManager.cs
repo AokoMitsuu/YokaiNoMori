@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using YokaiNoMori.Enumeration;
+
 
 namespace YokaiNoMori.Interface
 {
@@ -17,6 +19,7 @@ namespace YokaiNoMori.Interface
         /// </summary>
         /// <returns></returns>
         public List<IBoardCase> GetAllBoardCase();
+
 
         /// <summary>
         /// Enable a specific type of action on a pawn

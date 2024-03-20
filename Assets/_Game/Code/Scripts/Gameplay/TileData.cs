@@ -50,6 +50,10 @@ public class TileData : IBoardCase
     {
         return m_PawnData;
     }
+    public bool IsBusy()
+    {
+        return m_PawnData != null;
+    }
 }
 
 public enum TileState

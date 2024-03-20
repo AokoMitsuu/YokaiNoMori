@@ -66,4 +66,8 @@ public class PawnData : IPawn
     {
         return m_Owner;
     }
+    public Vector2Int GetCurrentPosition()
+    {
+        return m_CurrentTile.GetPosition();
+    }
 }

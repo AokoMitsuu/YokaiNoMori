@@ -1,3 +1,4 @@
+using System;
 using YokaiNoMori.Enumeration;
 
 namespace YokaiNoMori.Interface
@@ -9,6 +10,7 @@ namespace YokaiNoMori.Interface
         /// </summary>
         /// <param name="igameManager"></param>
         public void Init(IGameManager igameManager);
+
 
         /// <summary>
         /// Used by my UI
@@ -28,6 +30,7 @@ namespace YokaiNoMori.Interface
         /// <param name="camp"></param>
         public void SetCamp(ECampType camp);
 
+
         /// <summary>
         /// Called by the Game Manager to warn the competitor that it's his turn.
         /// </summary>
@@ -38,4 +41,5 @@ namespace YokaiNoMori.Interface
         /// </summary>
         public void StopTurn();
     }
+
 }

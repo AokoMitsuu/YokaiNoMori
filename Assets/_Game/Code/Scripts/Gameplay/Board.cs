@@ -12,8 +12,6 @@ using Unity.VisualScripting;
 
 public class Board : MonoBehaviour, IGameManager
 {
-    [SerializeField] private TreeGen tree;
-
     [Header("Settings")]
     [SerializeField] private ScenarioSo m_Scenario;
     [SerializeField] private VictoryRuleSo m_VictoryRule;
@@ -77,6 +75,8 @@ public class Board : MonoBehaviour, IGameManager
     private Tween m_BoardRotation;
     private Tween m_LabelTranslation;
 
+    private ICompetitor m_IA;
+
     #region Setup
 
     protected void Start()
@@ -96,9 +96,10 @@ public class Board : MonoBehaviour, IGameManager
         }
         m_TurnCoroutine = StartCoroutine(ShowLabel(P1_Color, "Au tour du joueur 1"));
 
-        m_BoardState = BoardState.P1_PawnSelection;
+        m_IA = GetComponent<IA>();
+        m_IA.Init(this, 180);
 
-        tree.GenerateTree(m_TileList, P1_ReserveList, P2_ReserveList);
+        m_BoardState = BoardState.P1_PawnSelection;
     }
     private void Clear()
     {
@@ -305,11 +306,11 @@ public class Board : MonoBehaviour, IGameManager
         {
             if (m_BoardState == BoardState.P1_PawnMove)
             {
-                RotateBoard(m_BoardState = BoardState.P2_PawnSelection);
+                SwitchTurn(m_BoardState = BoardState.P2_PawnSelection);
             }
             else
             {
-                RotateBoard(m_BoardState = BoardState.P1_PawnSelection);
+                SwitchTurn(m_BoardState = BoardState.P1_PawnSelection);
             }
         }
     }
@@ -390,7 +391,7 @@ public class Board : MonoBehaviour, IGameManager
 
     #region Tweens
 
-    private void RotateBoard(BoardState pNewState)
+    private void SwitchTurn(BoardState pNewState)
     {
         m_BoardState = BoardState.Idle;
 
@@ -407,8 +408,15 @@ public class Board : MonoBehaviour, IGameManager
         }
 
         m_BoardRotation = m_ToRotate.DORotate(new Vector3(0, 0, 180f), m_RotateDelay, RotateMode.LocalAxisAdd)
-                                              .SetEase(m_RotateEase)
-                                              .OnComplete(() => { m_BoardState = pNewState; m_SoundBeginTurn.Play(); });
+                          .SetEase(m_RotateEase)
+                          .OnComplete(() =>
+                          {
+                              m_BoardState = pNewState;
+                              m_SoundBeginTurn.Play();
+                              if(m_IA != null && pNewState != BoardState.P1_PawnSelection)
+                              m_IA.GetDatas();
+                              m_IA.StartTurn();
+                          });
     }
     private IEnumerator ShowLabel(Color pColor, string pText, float pDelay = 0)
     {
@@ -452,6 +460,10 @@ public class Board : MonoBehaviour, IGameManager
 
     #region Utils
 
+    public (List<TileData>, List<TileData>, List<TileData>) GetBoardState()
+    {
+        return (m_TileList, P1_ReserveList, P2_ReserveList);
+    }
     private Vector3 BoardPositionToWorldPosition(int x, int y)
     {
         float xOffset = x * (m_TileSize + m_TileSpacing);
@@ -524,7 +536,37 @@ public class Board : MonoBehaviour, IGameManager
     }
     public void DoAction(IPawn pawnTarget, Vector2Int position, EActionType actionType)
     {
-        //TODO
+        PawnData selectedPawn = m_TileList.Find(tile => tile.GetPosition() == pawnTarget.GetCurrentPosition()).PawnData;
+        PawnDisplay selectedPawnDisplay = m_SpawnedPawnDisplays.Find(display => display.PawnData == selectedPawn);
+        m_SelectedTileDisplay = m_SpawnedTileDisplays.Find(display => display.TileData.PawnData == selectedPawn);
+        TileData targetTile = m_TileList.Find(tile => tile.GetPosition() == position);
+        MovePawnTo(selectedPawn, selectedPawnDisplay.transform, targetTile);
+    }
+    public List<IPawn> GetReservePawnsByPlayer(ECampType campType)
+    {
+        List<IPawn> result = new();
+
+        List<TileData> campList = campType == ECampType.PLAYER_ONE ? P1_ReserveList : P2_ReserveList;
+
+        foreach (TileData tile in campList)
+        {
+            result.Add(tile.GetPawnOnIt());
+        }
+
+        return result;
+    }
+    public List<IPawn> GetPawnsOnBoard(ECampType campType)
+    {
+        List<IPawn> result = new();
+
+        List<PawnData> campList = campType == ECampType.PLAYER_ONE ? P1_PawnList : P2_PawnList;
+
+        foreach (PawnData pawn in campList)
+        {
+            result.Add(pawn);
+        }
+
+        return result;
     }
 }
 

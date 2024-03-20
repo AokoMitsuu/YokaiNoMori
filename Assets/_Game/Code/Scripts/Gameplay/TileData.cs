@@ -4,14 +4,13 @@ using UnityEngine;
 using YokaiNoMori.Enumeration;
 using YokaiNoMori.Interface;
 
-[Serializable]
 public class TileData : IBoardCase
 {
     private bool m_IsReserve = false;
 
     private Board m_Board;
     private ECampType m_TeamBackRow = ECampType.NONE;
-    [ReadOnly, SerializeField] private PawnData m_PawnData;
+    private PawnData m_PawnData;
     private Vector2Int m_Position;
 
     public Board Board { get => m_Board; set => m_Board = value; }

@@ -30,6 +30,10 @@ namespace YokaiNoMori.Interface
         /// <param name="camp"></param>
         public void SetCamp(ECampType camp);
 
+        /// <summary>
+        /// Used before StartTurn() for getting data from the board
+        /// </summary>
+        public void GetDatas();
 
         /// <summary>
         /// Called by the Game Manager to warn the competitor that it's his turn.

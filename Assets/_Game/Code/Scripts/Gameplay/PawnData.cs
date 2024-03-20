@@ -5,10 +5,9 @@ using UnityEngine;
 using YokaiNoMori.Enumeration;
 using YokaiNoMori.Interface;
 
-[Serializable]
 public class PawnData : IPawn
 {
-    [ReadOnly, SerializeField] private PawnSo m_PawnSo;
+    private PawnSo m_PawnSo;
     private ECampType m_Team;
     private ICompetitor m_Owner;
     private TileData m_CurrentTile;

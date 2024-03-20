@@ -336,7 +336,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d210259631b2334dbae6e58ed7460fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tree: {fileID: 328843348}
   m_Scenario: {fileID: 11400000, guid: 6d4365b2c7a08d14eb8514168bd8c270, type: 2}
   m_VictoryRule: {fileID: 11400000, guid: ffbe451f58769ad4ba02d78c2a5f5900, type: 2}
   m_TileSize: 1
@@ -391,13 +390,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 328843345}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d23fa0db7eebcd740a103b785023d921, type: 3}
+  m_Script: {fileID: 11500000, guid: a694cfcc9f89a4a40afc86e0a6577fda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_Board: {fileID: 328843347}
   m_StartTimer: 0
-  m_TimerMax: 180
-  m_DepthMax: 2
-  Count: 1
+  m_MaxThinkingTimer: 180
+  m_DepthMax: 4
+  m_ScoreIaTake: 5
+  m_ScorePlayerTake: -3
+  m_ScoreMove: 1
+  m_VictoryRule: {fileID: 11400000, guid: ffbe451f58769ad4ba02d78c2a5f5900, type: 2}
 --- !u!1 &359341264
 GameObject:
   m_ObjectHideFlags: 0

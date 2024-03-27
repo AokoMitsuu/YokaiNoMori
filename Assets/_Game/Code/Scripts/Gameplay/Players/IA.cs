@@ -19,7 +19,6 @@ public class IA : MonoBehaviour, ICompetitor
     [SerializeField] private int m_ScoreLose = 50000;
     [SerializeField] private VictoryRuleSo m_VictoryRule;
 
-    private BoardData BoardData = new();
     private BoardData m_BestBoardData = null;
     private int m_MaxScore = -1;
 
@@ -33,67 +32,6 @@ public class IA : MonoBehaviour, ICompetitor
 
     #region IA
 
-    public void GenerateTree(List<TileData> pBoardData, List<TileData> pReserveP1, List<TileData> pReserveP2)
-    {
-        m_StartTimer = Time.realtimeSinceStartup;
-        BoardData.CurrentBoard = DeepCloneTileList(pBoardData);
-        BoardData.P1Reserve = DeepCloneTileList(pReserveP1);
-        BoardData.P2Reserve = DeepCloneTileList(pReserveP2);
-
-        GenerateSubNode(BoardData, 0, m_DepthMax);
-    }
-    private void GenerateSubNode(BoardData pBoardData, int pDepth, int pMaxDepth = 10)
-    {
-        if (pDepth >= pMaxDepth)
-        {
-            return;
-        }
-
-        List<BoardData> allPossibilities = ListAllPossibilities(pBoardData, pDepth);
-
-        pBoardData.Possibilities = allPossibilities;
-
-        foreach (BoardData pData in pBoardData.Possibilities)
-        {
-            if (Time.realtimeSinceStartup - m_StartTimer > m_MaxThinkingTimer)
-            {
-                return;
-            }
-
-            List<PawnData> P1_Pawn = new();
-            List<PawnData> P2_Pawn = new();
-
-            foreach (TileData tiles in pData.CurrentBoard)
-            {
-                if (tiles.PawnData == null)
-                    continue;
-
-                if (tiles.PawnData.Team == ECampType.PLAYER_ONE)
-                {
-                    P1_Pawn.Add(tiles.PawnData);
-                }
-                else
-                {
-                    P2_Pawn.Add(tiles.PawnData);
-                }
-            }
-
-            ECampType winner = m_VictoryRule.CheckVictory(pData.CurrentBoard, P1_Pawn, P2_Pawn);
-
-            if (winner == ECampType.PLAYER_TWO)
-            {
-                pData.Score += m_ScoreWin;
-            }
-            else if (winner == ECampType.PLAYER_ONE)
-            {
-                pData.Score -= m_ScoreLose;
-            }
-            else
-            {
-                GenerateSubNode(pData, pDepth + 1, pMaxDepth);
-            }
-        }
-    }
     private List<BoardData> ListAllPossibilities(BoardData pBoardTiles, int pDepth)
     {
         List<BoardData> result = new();
@@ -161,6 +99,35 @@ public class IA : MonoBehaviour, ICompetitor
 
                 targetTile.SetPawn(newBoard.CurrentBoard[i].PawnData, null);
                 newBoard.CurrentBoard[i].SetPawn(null, null);
+
+                List<PawnData> P1_Pawn = new();
+                List<PawnData> P2_Pawn = new();
+
+                foreach (TileData tiles in newBoard.CurrentBoard)
+                {
+                    if (tiles.PawnData == null)
+                        continue;
+
+                    if (tiles.PawnData.Team == ECampType.PLAYER_ONE)
+                    {
+                        P1_Pawn.Add(tiles.PawnData);
+                    }
+                    else
+                    {
+                        P2_Pawn.Add(tiles.PawnData);
+                    }
+                }
+
+                ECampType winner = m_VictoryRule.CheckVictory(newBoard.CurrentBoard, P1_Pawn, P2_Pawn);
+
+                if (winner == ECampType.PLAYER_TWO)
+                {
+                    newBoard.Score += m_ScoreWin;
+                }
+                else if (winner == ECampType.PLAYER_ONE)
+                {
+                    newBoard.Score -= m_ScoreLose;
+                }
 
                 result.Add(newBoard);
             }
@@ -321,10 +288,11 @@ public class IA : MonoBehaviour, ICompetitor
     {
         m_MaxScore = int.MinValue;
         m_BestBoardData = null;
+        List<BoardData> allPossibilities = ListAllPossibilities(main, 0);
 
-        foreach (BoardData sub in main.Possibilities)
+        foreach (BoardData sub in allPossibilities)
         {
-            int score = Minimax(sub, false);
+            int score = Minimax(sub, 1, m_DepthMax, false);
             if (m_MaxScore < score)
             {
                 m_MaxScore = score;
@@ -332,9 +300,11 @@ public class IA : MonoBehaviour, ICompetitor
             }
         }
     }
-    private int Minimax(BoardData pBoard, bool pIsMaximizingPlayer)
+    private int Minimax(BoardData pBoard, int pDepth, int maxDepth, bool pIsMaximizingPlayer)
     {
-        if (pBoard.Possibilities.Count == 0)
+        List<BoardData> allPossibilities = ListAllPossibilities(pBoard, pDepth);
+
+        if (allPossibilities.Count == 0 || maxDepth == pDepth || Time.realtimeSinceStartup - m_StartTimer > m_MaxThinkingTimer)
         {
             return pBoard.Score;
         }
@@ -342,9 +312,9 @@ public class IA : MonoBehaviour, ICompetitor
         if (pIsMaximizingPlayer)
         {
             int maxEval = int.MinValue;
-            foreach (var child in pBoard.Possibilities)
+            foreach (var child in allPossibilities)
             {
-                int eval = Minimax(child, false);
+                int eval = Minimax(child, pDepth + 1, maxDepth, false);
                 maxEval = Math.Max(maxEval, eval);
             }
             return maxEval;
@@ -352,9 +322,9 @@ public class IA : MonoBehaviour, ICompetitor
         else
         {
             int minEval = int.MaxValue;
-            foreach (var child in pBoard.Possibilities)
+            foreach (var child in allPossibilities)
             {
-                int eval = Minimax(child, true);
+                int eval = Minimax(child, pDepth + 1, maxDepth, true);
                 minEval = Math.Min(minEval, eval);
             }
             return minEval;
@@ -383,18 +353,19 @@ public class IA : MonoBehaviour, ICompetitor
     }
     public void GetDatas()
     {
-        //m_TileList = m_Board.GetAllBoardCase();
-        //P1_ReserveList = m_Board.GetReservePawnsByPlayer(ECampType.PLAYER_ONE);
-        //P2_ReserveList = m_Board.GetReservePawnsByPlayer(ECampType.PLAYER_TWO);
-
         m_TileList = m_Board.GetBoardState().Item1;
         P1_ReserveList = m_Board.GetBoardState().Item2;
         P2_ReserveList = m_Board.GetBoardState().Item3;
     }
     public void StartTurn()
     {
-        GenerateTree(m_TileList, P1_ReserveList, P2_ReserveList);
-        FindBestPossibility(BoardData);
+        m_StartTimer = Time.realtimeSinceStartup;
+        BoardData boardData = new();
+
+        boardData.CurrentBoard = DeepCloneTileList(m_TileList);
+        boardData.P1Reserve = DeepCloneTileList(P1_ReserveList);
+        boardData.P2Reserve = DeepCloneTileList(P2_ReserveList);
+        FindBestPossibility(boardData);
         m_BoardInterface.DoAction(m_BestBoardData.CurrentPawnSelect, m_BestBoardData.CurrentTileSelect.GetPosition(), m_BestBoardData.ActionType);
     }
     public void StopTurn()

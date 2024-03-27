@@ -80,15 +80,15 @@ public class IA : MonoBehaviour, ICompetitor
 
             ECampType winner = m_VictoryRule.CheckVictory(pData.CurrentBoard, P1_Pawn, P2_Pawn);
 
-            if (winner == ECampType.PLAYER_ONE)
+            if (winner == ECampType.PLAYER_TWO)
             {
-                pBoardData.Score += m_ScoreWin;
                 pData.Score = pBoardData.Score;
+                pData.Score += m_ScoreWin;
             }
-            else if (winner == ECampType.PLAYER_TWO)
+            else if (winner == ECampType.PLAYER_ONE)
             {
-                pBoardData.Score -= m_ScoreLose;
                 pData.Score = pBoardData.Score;
+                pData.Score -= m_ScoreLose;
             }
             else
             {
@@ -316,17 +316,46 @@ public class IA : MonoBehaviour, ICompetitor
     }
     private void FindBestPossibility(BoardData main)
     {
-        if (main.Possibilities.Count == 0 && main.Score > m_MaxScore)
+        m_MaxScore = int.MinValue;
+        m_BestBoardData = null;
+
+        foreach (BoardData sub in main.Possibilities)
         {
-            m_MaxScore = main.Score;
-            m_BestBoardData = main;
-        }
-        else if(main.Possibilities.Count != 0)
-        {
-            foreach (BoardData sub in main.Possibilities)
+            int score = Minimax(sub, false);
+            if (m_MaxScore < score)
             {
-                FindBestPossibility(sub);
+                m_MaxScore = score;
+                m_BestBoardData = sub;
             }
+        }
+    }
+
+    private int Minimax(BoardData pBoard, bool pIsMaximizingPlayer)
+    {
+        if (pBoard.Possibilities.Count == 0)
+        {
+            return pBoard.Score;
+        }
+
+        if (pIsMaximizingPlayer)
+        {
+            int maxEval = int.MinValue;
+            foreach (var child in pBoard.Possibilities)
+            {
+                int eval = Minimax(child, false);
+                maxEval = Math.Max(maxEval, eval);
+            }
+            return maxEval;
+        }
+        else
+        {
+            int minEval = int.MaxValue;
+            foreach (var child in pBoard.Possibilities)
+            {
+                int eval = Minimax(child, true);
+                minEval = Math.Min(minEval, eval);
+            }
+            return minEval;
         }
     }
 
@@ -363,8 +392,6 @@ public class IA : MonoBehaviour, ICompetitor
     public void StartTurn()
     {
         GenerateTree(m_TileList, P1_ReserveList, P2_ReserveList);
-        m_MaxScore = 0;
-        m_BestBoardData = null;
         FindBestPossibility(BoardData);
         m_BoardInterface.DoAction(m_BestBoardData.CurrentPawnSelect, m_BestBoardData.CurrentTileSelect.GetPosition(), EActionType.MOVE); //TODO : Parachutage
     }

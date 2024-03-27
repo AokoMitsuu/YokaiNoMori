@@ -396,10 +396,11 @@ MonoBehaviour:
   m_Board: {fileID: 328843347}
   m_StartTimer: 0
   m_MaxThinkingTimer: 180
-  m_DepthMax: 2
+  m_DepthMax: 3
   m_ScoreIaTake: 5
   m_ScorePlayerTake: -3
   m_ScoreMove: 1
+  m_ScoreDrop: 2
   m_ScoreWin: 500
   m_ScoreLose: 50000
   m_VictoryRule: {fileID: 11400000, guid: ffbe451f58769ad4ba02d78c2a5f5900, type: 2}

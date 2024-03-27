@@ -14,6 +14,7 @@ public class IA : MonoBehaviour, ICompetitor
     [SerializeField] private int m_ScoreIaTake = 5;
     [SerializeField] private int m_ScorePlayerTake = -3;
     [SerializeField] private int m_ScoreMove = 1;
+    [SerializeField] private int m_ScoreDrop = 2;
     [SerializeField] private int m_ScoreWin = 500;
     [SerializeField] private int m_ScoreLose = 50000;
     [SerializeField] private VictoryRuleSo m_VictoryRule;
@@ -81,11 +82,13 @@ public class IA : MonoBehaviour, ICompetitor
 
             if (winner == ECampType.PLAYER_ONE)
             {
-                pData.Score += m_ScoreWin;
+                pBoardData.Score += m_ScoreWin;
+                pData.Score = pBoardData.Score;
             }
             else if (winner == ECampType.PLAYER_TWO)
             {
-                pData.Score -= m_ScoreLose;
+                pBoardData.Score -= m_ScoreLose;
+                pData.Score = pBoardData.Score;
             }
             else
             {
@@ -124,6 +127,7 @@ public class IA : MonoBehaviour, ICompetitor
                 {
                     newBoard.CurrentTileSelect = targetTile;
                     newBoard.CurrentPawnSelect = pBoardTiles.CurrentBoard[i].PawnData;
+                    newBoard.DebugSelect = pBoardTiles.CurrentBoard[i];
                 }
                 else
                 {
@@ -131,25 +135,27 @@ public class IA : MonoBehaviour, ICompetitor
                     newBoard.CurrentPawnSelect = pBoardTiles.CurrentPawnSelect;
                 }
 
+                newBoard.Score = pBoardTiles.Score;
+
                 if (targetTile.PawnData != null)
                 {
                     if (pDepth % 2 == 0)
                     {
                         newBoard.P1Reserve.Find(x => x.PawnData == null).SetPawn(targetTile.PawnData, null);
-                        pBoardTiles.Score += m_ScoreIaTake;
+                        newBoard.Score += m_ScoreIaTake;
                     }
                     else
                     {
                         newBoard.P2Reserve.Find(x => x.PawnData == null).SetPawn(targetTile.PawnData, null);
-                        pBoardTiles.Score += m_ScorePlayerTake;
+                        newBoard.Score += m_ScorePlayerTake;
 
                     }
                 }
                 else
                 {
-                    pBoardTiles.Score += m_ScoreMove;
+                    newBoard.Score += m_ScoreMove;
                 }
-                newBoard.Score = pBoardTiles.Score;
+
                 targetTile.SetPawn(newBoard.CurrentBoard[i].PawnData, null);
                 newBoard.CurrentBoard[i].SetPawn(null, null);
 
@@ -157,7 +163,7 @@ public class IA : MonoBehaviour, ICompetitor
             }
         }
 
-        if (pDepth % 2 == 0)
+        if (pDepth % 2 == 1)
         {
             for (int i = 0; i < pBoardTiles.P1Reserve.Count; i++)
             {
@@ -177,6 +183,7 @@ public class IA : MonoBehaviour, ICompetitor
                     newBoard.CurrentBoard = newList;
                     newBoard.P1Reserve = newReserveP1;
                     newBoard.P2Reserve = newReserveP2;
+                    newBoard.Score = pBoardTiles.Score;
 
                     TileData targetTile = newList.Find(x => x.GetPosition().Equals(range.GetPosition()));
                     targetTile.SetPawn(newList[i].PawnData, null);
@@ -213,7 +220,8 @@ public class IA : MonoBehaviour, ICompetitor
                     newBoard.CurrentBoard = newList;
                     newBoard.P2Reserve = newReserveP2;
                     newBoard.P1Reserve = newReserveP1;
-
+                    newBoard.Score = pBoardTiles.Score;
+                    newBoard.Score += m_ScoreDrop;
                     TileData targetTile = newList.Find(x => x.GetPosition().Equals(range.GetPosition()));
                     targetTile.SetPawn(newList[i].PawnData, null);
 
@@ -313,7 +321,7 @@ public class IA : MonoBehaviour, ICompetitor
             m_MaxScore = main.Score;
             m_BestBoardData = main;
         }
-        else
+        else if(main.Possibilities.Count != 0)
         {
             foreach (BoardData sub in main.Possibilities)
             {
@@ -372,6 +380,7 @@ public class BoardData
     public List<TileData> P1Reserve;
     public List<TileData> P2Reserve;
     public PawnData CurrentPawnSelect;
+    public TileData DebugSelect;
     public TileData CurrentTileSelect;
     public int Score = 0;
 

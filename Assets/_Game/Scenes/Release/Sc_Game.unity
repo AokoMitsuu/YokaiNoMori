@@ -396,7 +396,7 @@ MonoBehaviour:
   m_Board: {fileID: 328843347}
   m_StartTimer: 0
   m_MaxThinkingTimer: 180
-  m_DepthMax: 3
+  m_DepthMax: 2
   m_ScoreIaTake: 5
   m_ScorePlayerTake: -3
   m_ScoreMove: 1

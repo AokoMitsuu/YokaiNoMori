@@ -14,6 +14,8 @@ public class IA : MonoBehaviour, ICompetitor
     [SerializeField] private int m_ScoreIaTake = 5;
     [SerializeField] private int m_ScorePlayerTake = -3;
     [SerializeField] private int m_ScoreMove = 1;
+    [SerializeField] private int m_ScoreWin = 500;
+    [SerializeField] private int m_ScoreLose = 50000;
     [SerializeField] private VictoryRuleSo m_VictoryRule;
 
     private BoardData BoardData = new();
@@ -79,11 +81,11 @@ public class IA : MonoBehaviour, ICompetitor
 
             if (winner == ECampType.PLAYER_ONE)
             {
-                pData.Score += 500;
+                pData.Score += m_ScoreWin;
             }
-            else if (winner == ECampType.PLAYER_ONE)
+            else if (winner == ECampType.PLAYER_TWO)
             {
-                pData.Score -= 500;
+                pData.Score -= m_ScoreLose;
             }
             else
             {
@@ -115,7 +117,6 @@ public class IA : MonoBehaviour, ICompetitor
                 newBoard.CurrentBoard = newList;
                 newBoard.P1Reserve = DeepCloneTileList(pBoardTiles.P1Reserve);
                 newBoard.P2Reserve = DeepCloneTileList(pBoardTiles.P2Reserve);
-                newBoard.Score = pBoardTiles.Score;
 
                 TileData targetTile = newList.Find(x => x.GetPosition().Equals(range.GetPosition()));
 
@@ -135,19 +136,20 @@ public class IA : MonoBehaviour, ICompetitor
                     if (pDepth % 2 == 0)
                     {
                         newBoard.P1Reserve.Find(x => x.PawnData == null).SetPawn(targetTile.PawnData, null);
-                        newBoard.Score += m_ScoreIaTake;
+                        pBoardTiles.Score += m_ScoreIaTake;
                     }
                     else
                     {
                         newBoard.P2Reserve.Find(x => x.PawnData == null).SetPawn(targetTile.PawnData, null);
-                        newBoard.Score += m_ScorePlayerTake;
+                        pBoardTiles.Score += m_ScorePlayerTake;
+
                     }
                 }
                 else
                 {
-                    newBoard.Score += m_ScoreMove;
+                    pBoardTiles.Score += m_ScoreMove;
                 }
-
+                newBoard.Score = pBoardTiles.Score;
                 targetTile.SetPawn(newBoard.CurrentBoard[i].PawnData, null);
                 newBoard.CurrentBoard[i].SetPawn(null, null);
 
@@ -353,6 +355,8 @@ public class IA : MonoBehaviour, ICompetitor
     public void StartTurn()
     {
         GenerateTree(m_TileList, P1_ReserveList, P2_ReserveList);
+        m_MaxScore = 0;
+        m_BestBoardData = null;
         FindBestPossibility(BoardData);
         m_BoardInterface.DoAction(m_BestBoardData.CurrentPawnSelect, m_BestBoardData.CurrentTileSelect.GetPosition(), EActionType.MOVE); //TODO : Parachutage
     }

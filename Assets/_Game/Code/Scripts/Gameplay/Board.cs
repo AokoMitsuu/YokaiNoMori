@@ -304,14 +304,20 @@ public class Board : MonoBehaviour, IGameManager
 
         if (!isWin)
         {
-            if (m_BoardState == BoardState.P1_PawnMove)
+            if (m_BoardState == BoardState.P1_PawnMove && App.Instance.SelectedGamemode == App.Gamemode.PvP)
             {
-                SwitchTurn(m_BoardState = BoardState.P2_PawnSelection);
+                m_BoardState = BoardState.P2_PawnSelection;
+            }
+            else if(App.Instance.SelectedGamemode == App.Gamemode.PvP || m_BoardState == BoardState.IA_Turn)
+            {
+                m_BoardState = BoardState.P1_PawnSelection;
             }
             else
             {
-                SwitchTurn(m_BoardState = BoardState.P1_PawnSelection);
+                m_BoardState = BoardState.IA_Turn;
             }
+
+            StartCoroutine(SwitchTurn(m_BoardState));
         }
     }
     private void CapturePawn(PawnData pPawn,  TileData pTileData)
@@ -391,32 +397,54 @@ public class Board : MonoBehaviour, IGameManager
 
     #region Tweens
 
-    private void SwitchTurn(BoardState pNewState)
+    private IEnumerator SwitchTurn(BoardState pNewState)
     {
         m_BoardState = BoardState.Idle;
 
         if (m_TurnCoroutine != null)
             StopCoroutine(m_TurnCoroutine);
 
-        if (pNewState == BoardState.P1_PawnSelection)
+        if(App.Instance.SelectedGamemode == App.Gamemode.PvP)
         {
-            m_TurnCoroutine = StartCoroutine(ShowLabel(P1_Color, "Au tour du joueur 1"));
+            if (pNewState == BoardState.P1_PawnSelection)
+            {
+                m_TurnCoroutine = StartCoroutine(ShowLabel(P1_Color, "Au tour du joueur 1"));
+                m_BoardRotation = m_ToRotate.DORotate(new Vector3(0, 0, 180f), m_RotateDelay, RotateMode.LocalAxisAdd)
+                .SetEase(m_RotateEase)
+                .OnComplete(() =>
+                {
+                    m_BoardState = pNewState;
+                    m_SoundBeginTurn.Play();
+                });
+            }
+            else if (pNewState == BoardState.P2_PawnSelection)
+            {
+                m_TurnCoroutine = StartCoroutine(ShowLabel(P2_Color, "Au tour du joueur 2"));
+                m_BoardRotation = m_ToRotate.DORotate(new Vector3(0, 0, 180f), m_RotateDelay, RotateMode.LocalAxisAdd)
+                .SetEase(m_RotateEase)
+                .OnComplete(() =>
+                {
+                    m_BoardState = pNewState;
+                    m_SoundBeginTurn.Play();
+                });
+            }
         }
         else
         {
-            m_TurnCoroutine = StartCoroutine(ShowLabel(P2_Color, "Au tour du joueur 2"));
+            if (pNewState == BoardState.IA_Turn)
+            {
+                yield return ShowLabel(P2_Color, "Au tour du joueur 2");
+                m_BoardState = pNewState;
+                m_IA.GetDatas();
+                m_IA.StartTurn();
+                m_SoundBeginTurn.Play();
+            }
+            else
+            {
+                yield return ShowLabel(P1_Color, "Au tour du joueur 1");
+                m_BoardState = pNewState;
+            }
         }
-
-        m_BoardRotation = m_ToRotate.DORotate(new Vector3(0, 0, 180f), m_RotateDelay, RotateMode.LocalAxisAdd)
-                          .SetEase(m_RotateEase)
-                          .OnComplete(() =>
-                          {
-                              m_BoardState = pNewState;
-                              m_SoundBeginTurn.Play();
-                              if(m_IA != null && pNewState != BoardState.P1_PawnSelection)
-                              m_IA.GetDatas();
-                              m_IA.StartTurn();
-                          });
     }
     private IEnumerator ShowLabel(Color pColor, string pText, float pDelay = 0)
     {
@@ -576,5 +604,6 @@ public enum BoardState
     P1_PawnSelection,
     P1_PawnMove,
     P2_PawnSelection,
-    P2_PawnMove
+    P2_PawnMove,
+    IA_Turn
 }

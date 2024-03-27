@@ -34,13 +34,13 @@ public class App : MonoBehaviour
     [SerializeField] private SceneManager m_SceneManager;
     [SerializeField] private TransitionManager m_TransitionManager;
 
-    private Gamemode m_GameMode = Gamemode.PvP;
+    private Gamemode m_SelectedGamemode = Gamemode.PvP;
 
     public AudioManager AudioManager { get { return m_AudioManager; } }
     public SceneManager SceneManager { get { return m_SceneManager; } }
     public TransitionManager TransitionManager { get { return m_TransitionManager; } }
 
-    public Gamemode GameMode { get => m_GameMode; set => m_GameMode = value; }
+    public Gamemode SelectedGamemode { get => m_SelectedGamemode; set => m_SelectedGamemode = value; }
 
     private void Load()
     {

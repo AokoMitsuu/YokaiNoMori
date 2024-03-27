@@ -8,7 +8,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine.UI;
 using System.Linq;
-using Unity.VisualScripting;
+using System;
 
 public class Board : MonoBehaviour, IGameManager
 {
@@ -178,7 +178,7 @@ public class Board : MonoBehaviour, IGameManager
     }
     private void SetupAmbiance()
     {
-        int randomNumber = Random.Range(0, m_BoardSpriteList.Count);
+        int randomNumber = UnityEngine.Random.Range(0, m_BoardSpriteList.Count);
         m_BoardSprite.sprite = m_BoardSpriteList[randomNumber];
     }
     private void SetupPawns()
@@ -564,10 +564,22 @@ public class Board : MonoBehaviour, IGameManager
     }
     public void DoAction(IPawn pawnTarget, Vector2Int position, EActionType actionType)
     {
-        PawnData selectedPawn = m_TileList.Find(tile => tile.GetPosition() == pawnTarget.GetCurrentPosition()).PawnData;
-        PawnDisplay selectedPawnDisplay = m_SpawnedPawnDisplays.Find(display => display.PawnData == selectedPawn);
+        PawnData selectedPawn;
+        PawnDisplay selectedPawnDisplay;
+        TileData targetTile;
+
+        if (actionType == EActionType.MOVE)
+        {
+            selectedPawn = m_TileList.Find(tile => tile.GetPosition() == pawnTarget.GetCurrentPosition()).PawnData;
+        }
+        else
+        {
+            selectedPawn = P2_ReserveList.Find(tile => tile.PawnData.GetPawnType() == pawnTarget.GetPawnType()).PawnData;
+        }
+
+        selectedPawnDisplay = m_SpawnedPawnDisplays.Find(display => display.PawnData == selectedPawn);
         m_SelectedTileDisplay = m_SpawnedTileDisplays.Find(display => display.TileData.PawnData == selectedPawn);
-        TileData targetTile = m_TileList.Find(tile => tile.GetPosition() == position);
+        targetTile = m_TileList.Find(tile => tile.GetPosition() == position);
         MovePawnTo(selectedPawn, selectedPawnDisplay.transform, targetTile);
     }
     public List<IPawn> GetReservePawnsByPlayer(ECampType campType)

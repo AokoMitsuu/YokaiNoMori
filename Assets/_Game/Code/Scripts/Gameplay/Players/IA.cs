@@ -80,7 +80,6 @@ public class IA : MonoBehaviour, ICompetitor
 
             ECampType winner = m_VictoryRule.CheckVictory(pData.CurrentBoard, P1_Pawn, P2_Pawn);
 
-            pData.Score = pBoardData.Score;
             if (winner == ECampType.PLAYER_TWO)
             {
                 pData.Score += m_ScoreWin;
@@ -134,19 +133,17 @@ public class IA : MonoBehaviour, ICompetitor
                     newBoard.CurrentPawnSelect = pBoardTiles.CurrentPawnSelect;
                 }
 
-                newBoard.Score = pBoardTiles.Score;
-
                 if (targetTile.PawnData != null)
                 {
                     if (pDepth % 2 == 0)
                     {
                         newBoard.P1Reserve.Find(x => x.PawnData == null).SetPawn(targetTile.PawnData, null);
-                        newBoard.Score += m_ScoreIaTake;
+                        newBoard.Score = m_ScoreIaTake;
                     }
                     else
                     {
                         newBoard.P2Reserve.Find(x => x.PawnData == null).SetPawn(targetTile.PawnData, null);
-                        newBoard.Score -= m_ScorePlayerTake;
+                        newBoard.Score = -m_ScorePlayerTake;
 
                     }
                 }
@@ -154,11 +151,11 @@ public class IA : MonoBehaviour, ICompetitor
                 {
                     if (pDepth % 2 == 0)
                     {
-                        newBoard.Score += m_ScoreMove;
+                        newBoard.Score = m_ScoreMove;
                     }
                     else
                     {
-                        newBoard.Score -= m_ScoreMove;
+                        newBoard.Score = -m_ScoreMove;
                     }
                 }
 
@@ -189,14 +186,14 @@ public class IA : MonoBehaviour, ICompetitor
                     newBoard.CurrentBoard = newList;
                     newBoard.P1Reserve = newReserveP1;
                     newBoard.P2Reserve = newReserveP2;
-                    newBoard.Score = pBoardTiles.Score;
-                    newBoard.Score -= m_ScoreDrop;
+                    newBoard.Score = -m_ScoreDrop;
+                    newBoard.ActionType = EActionType.PARACHUTE;
                     TileData targetTile = newList.Find(x => x.GetPosition().Equals(range.GetPosition()));
                     targetTile.SetPawn(newList[i].PawnData, null);
 
                     newReserveP1[i].SetPawn(null, null);
 
-                    if (pDepth == 1)
+                    if (pDepth == 0)
                     {
                         newBoard.CurrentTileSelect = targetTile;
                         newBoard.CurrentPawnSelect = pBoardTiles.P1Reserve[i].PawnData;
@@ -226,14 +223,14 @@ public class IA : MonoBehaviour, ICompetitor
                     newBoard.CurrentBoard = newList;
                     newBoard.P2Reserve = newReserveP2;
                     newBoard.P1Reserve = newReserveP1;
-                    newBoard.Score = pBoardTiles.Score;
-                    newBoard.Score += m_ScoreDrop;
+                    newBoard.Score = m_ScoreDrop;
+                    newBoard.ActionType = EActionType.PARACHUTE;
                     TileData targetTile = newList.Find(x => x.GetPosition().Equals(range.GetPosition()));
                     targetTile.SetPawn(newList[i].PawnData, null);
 
                     newReserveP2[i].SetPawn(null, null);
 
-                    if (pDepth == 1)
+                    if (pDepth == 0)
                     {
                         newBoard.CurrentTileSelect = targetTile;
                         newBoard.CurrentPawnSelect = pBoardTiles.P2Reserve[i].PawnData;
@@ -327,7 +324,7 @@ public class IA : MonoBehaviour, ICompetitor
 
         foreach (BoardData sub in main.Possibilities)
         {
-            int score = Minimax(sub, true);
+            int score = Minimax(sub, false);
             if (m_MaxScore < score)
             {
                 m_MaxScore = score;
@@ -398,7 +395,7 @@ public class IA : MonoBehaviour, ICompetitor
     {
         GenerateTree(m_TileList, P1_ReserveList, P2_ReserveList);
         FindBestPossibility(BoardData);
-        m_BoardInterface.DoAction(m_BestBoardData.CurrentPawnSelect, m_BestBoardData.CurrentTileSelect.GetPosition(), EActionType.MOVE); //TODO : Parachutage
+        m_BoardInterface.DoAction(m_BestBoardData.CurrentPawnSelect, m_BestBoardData.CurrentTileSelect.GetPosition(), m_BestBoardData.ActionType);
     }
     public void StopTurn()
     {
@@ -417,4 +414,5 @@ public class BoardData
     public int Score = 0;
 
     public List<BoardData> Possibilities = new();
+    public EActionType ActionType = EActionType.MOVE;
 }

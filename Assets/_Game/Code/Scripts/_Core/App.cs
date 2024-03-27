@@ -34,9 +34,13 @@ public class App : MonoBehaviour
     [SerializeField] private SceneManager m_SceneManager;
     [SerializeField] private TransitionManager m_TransitionManager;
 
+    private Gamemode m_GameMode = Gamemode.PvP;
+
     public AudioManager AudioManager { get { return m_AudioManager; } }
     public SceneManager SceneManager { get { return m_SceneManager; } }
     public TransitionManager TransitionManager { get { return m_TransitionManager; } }
+
+    public Gamemode GameMode { get => m_GameMode; set => m_GameMode = value; }
 
     private void Load()
     {
@@ -46,5 +50,13 @@ public class App : MonoBehaviour
         //App settings
         Application.targetFrameRate = 144;
         QualitySettings.vSyncCount = 0;
+    }
+
+    public enum Gamemode
+    {
+        PvP,
+        PvE_Facile,
+        PvE_Moyen,
+        PvE_Difficile
     }
 }

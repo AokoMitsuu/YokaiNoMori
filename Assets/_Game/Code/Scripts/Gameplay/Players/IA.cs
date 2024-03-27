@@ -80,14 +80,13 @@ public class IA : MonoBehaviour, ICompetitor
 
             ECampType winner = m_VictoryRule.CheckVictory(pData.CurrentBoard, P1_Pawn, P2_Pawn);
 
+            pData.Score = pBoardData.Score;
             if (winner == ECampType.PLAYER_TWO)
             {
-                pData.Score = pBoardData.Score;
                 pData.Score += m_ScoreWin;
             }
             else if (winner == ECampType.PLAYER_ONE)
             {
-                pData.Score = pBoardData.Score;
                 pData.Score -= m_ScoreLose;
             }
             else
@@ -147,13 +146,20 @@ public class IA : MonoBehaviour, ICompetitor
                     else
                     {
                         newBoard.P2Reserve.Find(x => x.PawnData == null).SetPawn(targetTile.PawnData, null);
-                        newBoard.Score += m_ScorePlayerTake;
+                        newBoard.Score -= m_ScorePlayerTake;
 
                     }
                 }
                 else
                 {
-                    newBoard.Score += m_ScoreMove;
+                    if (pDepth % 2 == 0)
+                    {
+                        newBoard.Score += m_ScoreMove;
+                    }
+                    else
+                    {
+                        newBoard.Score -= m_ScoreMove;
+                    }
                 }
 
                 targetTile.SetPawn(newBoard.CurrentBoard[i].PawnData, null);
@@ -184,7 +190,7 @@ public class IA : MonoBehaviour, ICompetitor
                     newBoard.P1Reserve = newReserveP1;
                     newBoard.P2Reserve = newReserveP2;
                     newBoard.Score = pBoardTiles.Score;
-
+                    newBoard.Score -= m_ScoreDrop;
                     TileData targetTile = newList.Find(x => x.GetPosition().Equals(range.GetPosition()));
                     targetTile.SetPawn(newList[i].PawnData, null);
 
@@ -321,7 +327,7 @@ public class IA : MonoBehaviour, ICompetitor
 
         foreach (BoardData sub in main.Possibilities)
         {
-            int score = Minimax(sub, false);
+            int score = Minimax(sub, true);
             if (m_MaxScore < score)
             {
                 m_MaxScore = score;
@@ -329,7 +335,6 @@ public class IA : MonoBehaviour, ICompetitor
             }
         }
     }
-
     private int Minimax(BoardData pBoard, bool pIsMaximizingPlayer)
     {
         if (pBoard.Possibilities.Count == 0)

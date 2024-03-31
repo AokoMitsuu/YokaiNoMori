@@ -306,7 +306,6 @@ public class Board : MonoBehaviour, IGameManager
             m_SoundMove.Play();
 
         m_SelectedTileDisplay = null;
-        ClearMoveState();
 
         if (!isWin)
         {

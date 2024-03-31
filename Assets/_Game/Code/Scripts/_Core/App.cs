@@ -50,14 +50,14 @@ public class App : MonoBehaviour
         //App settings
         Application.targetFrameRate = 144;
         QualitySettings.vSyncCount = 0;
-        m_SelectedGamemode = Gamemode.PvE_Difficile;
     }
 
     public enum Gamemode
     {
         PvP,
-        PvE_Facile,
-        PvE_Moyen,
-        PvE_Difficile
+        IA_Debutant,
+        IA_Moyen,
+        IA_Confirme,
+        IA_Expert
     }
 }

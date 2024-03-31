@@ -9,7 +9,7 @@ public class IA : MonoBehaviour, ICompetitor
     [SerializeField] private Board m_Board;
 
     [Header("Settings")]
-    [SerializeField] private int m_DepthMax = 4;
+    [SerializeField] private int m_MaxDepth = 4;
     [SerializeField] private float m_MaxThinkingTimer = 30.0f;
 
     [Header("Weights")]
@@ -56,7 +56,7 @@ public class IA : MonoBehaviour, ICompetitor
     {
         List<BoardData> nodes = ListAllPossibilities(pBoard, pDepth);
 
-        if (nodes.Count == 0 || pDepth >= m_DepthMax  || Time.realtimeSinceStartup - m_StartTimer > m_MaxThinkingTimer)
+        if (nodes.Count == 0 || pDepth >= m_MaxDepth  || Time.realtimeSinceStartup - m_StartTimer > m_MaxThinkingTimer)
         {
             return pBoard.Score;
         }
@@ -337,6 +337,7 @@ public class IA : MonoBehaviour, ICompetitor
     {
         m_BoardInterface = igameManager;
         m_MaxThinkingTimer = timerForAI;
+        m_MaxDepth = (int)App.Instance.SelectedGamemode;
     }
     public void SetCamp(ECampType camp)
     {

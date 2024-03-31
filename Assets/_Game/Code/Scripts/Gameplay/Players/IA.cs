@@ -56,7 +56,7 @@ public class IA : MonoBehaviour, ICompetitor
     {
         List<BoardData> nodes = ListAllPossibilities(pBoard, pDepth);
 
-        if (nodes.Count == 0 || pDepth >= m_DepthMax  || Time.realtimeSinceStartup - m_StartTimer > m_MaxThinkingTimer || pBoard.HasSomeoneWon)
+        if (nodes.Count == 0 || pDepth >= m_DepthMax  || Time.realtimeSinceStartup - m_StartTimer > m_MaxThinkingTimer)
         {
             return pBoard.Score;
         }
@@ -104,7 +104,7 @@ public class IA : MonoBehaviour, ICompetitor
                 newBoard.P1Reserve = Clone(pBoardData.P1Reserve);
                 newBoard.P2Reserve = Clone(pBoardData.P2Reserve);
 
-                TileData targetTile = newBoardTiles.Find(tile => tile.GetPosition().Equals(tile.GetPosition()));
+                TileData targetTile = newBoardTiles.Find(x => x.GetPosition().Equals(tile.GetPosition()));
 
                 if (pDepth == 0)
                 {
@@ -193,7 +193,7 @@ public class IA : MonoBehaviour, ICompetitor
                     newBoard.CurrentBoard = newTileList;
                     newBoard.P1Reserve = newReserveP1;
                     newBoard.P2Reserve = newReserveP2;
-                    newBoard.Score = -m_ScoreDrop;
+                    newBoard.Score = m_ScoreDrop;
 
                     TileData targetTile = newTileList.Find(x => x.GetPosition().Equals(range.GetPosition()));
                     targetTile.SetPawn(newTileList[i].PawnData, null);
@@ -298,10 +298,11 @@ public class IA : MonoBehaviour, ICompetitor
         foreach (TileData tileToClone in pTileListToClone)
         {
             TileData clonedTile = new();                          //New Tile
-            clonedTile.SetPosition(tileToClone.GetPosition());    //Position
-            clonedTile.Board = tileToClone.Board;                 //Board
-            clonedTile.SetTeamBackRow(tileToClone.TeamBackRow);   //Backrow
             if (tileToClone.IsReserve) clonedTile.SetIsReserve(); //IsReserve
+            clonedTile.Board = tileToClone.Board;                 //Board
+            clonedTile.SetPosition(tileToClone.GetPosition());    //Position
+            clonedTile.SetTeamBackRow(tileToClone.TeamBackRow);   //Backrow
+
             if (tileToClone.PawnData != null)                     
             {
                 PawnData clonePawn = new();
@@ -343,8 +344,9 @@ public class IA : MonoBehaviour, ICompetitor
     }
     public void StartTurn()
     {
-        BoardData boardData = new();
         m_StartTimer = Time.realtimeSinceStartup;
+
+        BoardData boardData = new();
 
         boardData.CurrentBoard = Clone(m_TileList);
         boardData.P1Reserve = Clone(P1_ReserveList);

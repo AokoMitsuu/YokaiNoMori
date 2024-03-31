@@ -36,7 +36,7 @@ public class PawnDisplay : MonoBehaviour
     {
         m_PromoteAnimator.gameObject.SetActive(true);
         yield return new WaitForSeconds(m_PromoteAnimator.runtimeAnimatorController.animationClips[0].length);
-        m_PawnData.Init(m_PawnData.PawnSo, m_PawnData.Team, m_PawnData.GetCurrentOwner());
+        m_PawnData.Init(m_PawnData.PawnSo.PromotedPawn, m_PawnData.Team, m_PawnData.GetCurrentOwner());
         yield return new WaitForSeconds(2f);
         m_PromoteAnimator.gameObject.SetActive(false);
     }

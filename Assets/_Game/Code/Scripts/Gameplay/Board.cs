@@ -9,6 +9,7 @@ using TMPro;
 using UnityEngine.UI;
 using System.Linq;
 using System;
+using System.Threading.Tasks;
 
 public class Board : MonoBehaviour, IGameManager
 {
@@ -95,6 +96,7 @@ public class Board : MonoBehaviour, IGameManager
             StopCoroutine(m_TurnCoroutine);
         }
         m_TurnCoroutine = StartCoroutine(ShowLabel(P1_Color, "Au tour du joueur 1"));
+        m_SoundBeginTurn.Play();
 
         m_IA = GetComponent<IA>();
         m_IA.Init(this, 180);
@@ -266,7 +268,7 @@ public class Board : MonoBehaviour, IGameManager
             m_BoardState = m_BoardState == BoardState.P1_PawnMove ? BoardState.P1_PawnSelection : BoardState.P2_PawnSelection;
         }
     }
-    private void MovePawnTo(PawnData pPawn, Transform pPawnTransform, TileData pTargetTile, bool pIsSetup = false)
+    private async void MovePawnTo(PawnData pPawn, Transform pPawnTransform, TileData pTargetTile, bool pIsSetup = false)
     {
         //Capture
         if (pTargetTile.PawnData != null) { CapturePawn(pTargetTile.PawnData, pTargetTile); }
@@ -290,9 +292,14 @@ public class Board : MonoBehaviour, IGameManager
 
         bool isWin = CheckWin();
 
-        if (pTargetTile.TeamBackRow != ECampType.NONE && pTargetTile.TeamBackRow != pPawn.Team && !m_SelectedTileDisplay.TileData.IsReserve && !isWin)
-            pPawn.Promote();
+        ClearMoveState();
 
+        if (pTargetTile.TeamBackRow != ECampType.NONE && pTargetTile.TeamBackRow != pPawn.Team && !m_SelectedTileDisplay.TileData.IsReserve && !isWin && pPawn.PawnSo.PromotedPawn != null)
+        {
+            pPawn.Promote();
+            await Task.Delay(9100);
+        }
+        
         if (m_SelectedTileDisplay.TileData.IsReserve)
             m_SoundDrop.Play();
         else
@@ -300,7 +307,7 @@ public class Board : MonoBehaviour, IGameManager
 
         m_SoundEndTurn.Play();
 
-        ClearMoveState();
+        m_SelectedTileDisplay = null;
 
         if (!isWin)
         {
@@ -383,7 +390,6 @@ public class Board : MonoBehaviour, IGameManager
     private void ClearMoveState()
     {
         m_SelectedTileDisplay?.SetState(TileState.None);
-        m_SelectedTileDisplay = null;
 
         foreach (var reachableTile in m_ReachableTiles)
         {
@@ -443,6 +449,7 @@ public class Board : MonoBehaviour, IGameManager
             {
                 yield return ShowLabel(P1_Color, "Au tour du joueur 1");
                 m_BoardState = pNewState;
+                m_SoundBeginTurn.Play();
             }
         }
     }

@@ -56,7 +56,7 @@ public class IA : MonoBehaviour, ICompetitor
     {
         List<BoardData> nodes = ListAllPossibilities(pBoard, pDepth);
 
-        if (nodes.Count == 0 || pDepth >= m_DepthMax  || Time.realtimeSinceStartup - m_StartTimer > m_MaxThinkingTimer)
+        if (nodes.Count == 0 || pDepth >= m_DepthMax  || Time.realtimeSinceStartup - m_StartTimer > m_MaxThinkingTimer || pBoard.HasSomeoneWon)
         {
             return pBoard.Score;
         }
@@ -159,12 +159,12 @@ public class IA : MonoBehaviour, ICompetitor
 
                 if (winner == ECampType.PLAYER_TWO)
                 {
-                    newBoard.Score += m_ScoreWin;
+                    newBoard.Score += pDepth % 2 == 0 ? m_ScoreWin : 0;
                     newBoard.HasSomeoneWon = true;
                 }
                 else if (winner == ECampType.PLAYER_ONE)
                 {
-                    newBoard.Score -= m_ScoreLose;
+                    newBoard.Score += pDepth % 2 == 0 ? 0 : -m_ScoreLose;
                     newBoard.HasSomeoneWon = true;
                 }
 

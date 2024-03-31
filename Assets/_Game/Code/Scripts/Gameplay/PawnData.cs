@@ -40,8 +40,6 @@ public class PawnData : IPawn
     {
         if (m_PawnSo.PromotedPawn == null) return;
 
-        m_PawnSo = m_PawnSo.PromotedPawn;
-
         OnPromote?.Invoke();
     }
 

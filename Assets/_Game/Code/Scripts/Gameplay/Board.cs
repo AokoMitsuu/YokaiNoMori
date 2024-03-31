@@ -305,9 +305,8 @@ public class Board : MonoBehaviour, IGameManager
         else
             m_SoundMove.Play();
 
-        m_SoundEndTurn.Play();
-
         m_SelectedTileDisplay = null;
+        ClearMoveState();
 
         if (!isWin)
         {
@@ -420,7 +419,6 @@ public class Board : MonoBehaviour, IGameManager
                 .OnComplete(() =>
                 {
                     m_BoardState = pNewState;
-                    m_SoundBeginTurn.Play();
                 });
             }
             else if (pNewState == BoardState.P2_PawnSelection)
@@ -431,7 +429,6 @@ public class Board : MonoBehaviour, IGameManager
                 .OnComplete(() =>
                 {
                     m_BoardState = pNewState;
-                    m_SoundBeginTurn.Play();
                 });
             }
         }
@@ -443,7 +440,6 @@ public class Board : MonoBehaviour, IGameManager
                 m_BoardState = pNewState;
                 m_IA.GetDatas();
                 m_IA.StartTurn();
-                m_SoundBeginTurn.Play();
             }
             else
             {
@@ -463,11 +459,14 @@ public class Board : MonoBehaviour, IGameManager
         m_TranslationImage.rectTransform.position = new Vector3(-Screen.width, m_TranslationImage.rectTransform.position.y, m_TranslationImage.rectTransform.position.z);
 
         //Move
+        m_SoundBeginTurn.Play();
         m_LabelTranslation = m_TranslationImage.rectTransform.DOAnchorPosX(0, m_TranslationDelay).SetEase(m_TranslationEase);
         yield return m_LabelTranslation.WaitForCompletion();
         yield return new WaitForSeconds(pDelay);
+        m_SoundEndTurn.Play();
         m_LabelTranslation = m_TranslationImage.rectTransform.DOAnchorPosX(Screen.width, m_TranslationDelay).SetEase(m_TranslationEase);
         yield return m_LabelTranslation.WaitForCompletion();
+
     }
     private IEnumerator EndScreen(ECampType pWiner)
     {
@@ -477,15 +476,15 @@ public class Board : MonoBehaviour, IGameManager
 
         if (pWiner == ECampType.PLAYER_ONE)
         {
-            yield return ShowLabel(P1_Color, "Joueur 1 a gagné", m_VictoryScreenDelay);
+            yield return ShowLabel(P1_Color, "Joueur 1 a gagnï¿½", m_VictoryScreenDelay);
         }
         else if (pWiner == ECampType.PLAYER_TWO)
         {
-            yield return ShowLabel(P2_Color, "Joueur 2 a gagné", m_VictoryScreenDelay);
+            yield return ShowLabel(P2_Color, "Joueur 2 a gagnï¿½", m_VictoryScreenDelay);
         }
         else
         {
-            yield return ShowLabel(Draw_Color, "Egalité", m_VictoryScreenDelay);
+            yield return ShowLabel(Draw_Color, "Egalitï¿½", m_VictoryScreenDelay);
         }
 
         Setup();

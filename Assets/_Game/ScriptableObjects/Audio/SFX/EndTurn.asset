@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad2ba305c806858438d627904a6dec78, type: 3}
   m_Name: EndTurn
   m_EditorClassIdentifier: 
-  m_AudioClip: {fileID: 8300000, guid: a76a119d07adfa746a67bdfdcad6513e, type: 3}
+  m_AudioClip: {fileID: 8300000, guid: 24768423c3bf472469090c2f8f538c97, type: 3}
   m_Volume: 0.15
   m_Pitch: 1
